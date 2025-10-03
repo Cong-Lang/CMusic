@@ -1,4 +1,4 @@
-import { app, BrowserWindow,ipcMain } from 'electron';
+import { app, BrowserWindow,ipcMain, dialog } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 const ipc = ipcMain
@@ -16,8 +16,9 @@ const createWindow = () => {
     transparent: true,
     webPreferences: {
       preload: path.join(__dirname, '/preload.js'),
-      nodeIntegration: true,
-      contextIsolation:true
+      contextIsolation:true,
+      experimentalFeatures: true,
+      webSecurity: false
     },
   });
   // and load the index.html of the app.
@@ -77,3 +78,14 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
+// 监听渲染进程的对话框请求（主进程处理）
+ipcMain.handle('show-open-dialog', async (event, options) => {
+  // 调用对话框并返回结果
+  const result = await dialog.showOpenDialog(options);
+  return result;
+});
+
+ipcMain.handle('show-save-dialog', async (event, options) => {
+  const result = await dialog.showSaveDialog(options);
+  return result;
+});
