@@ -16,23 +16,23 @@
         </div>
     </div>
     <TransitionGroup>
-        <wintopappbar style="top:36px" :items="[{ 'name': '最近' }, { 'name': '库' }]" :rightMenu="[{ 'name': '设置' }]"
+        <wintopappbar style="top:36px" :items="[{ 'name': '最近' }, { 'name': '我的库' }]" :rightMenu="[{ 'name': '设置' }]"
             @update="nextPage" v-if="isBigMusic === false" />
         <Transition v-if="isBigMusic === false">
             <div class="container-1">
                 <main class="container-2" v-if="page === 0">
                     <div class="showcase">
-                        <p style="height: 24px;width: 100%;margin: 0;"></p>
-                        <h1 style="margin:0 ;color: #FFF;text-align: center;">今日推荐</h1>
-                        <p style="margin-top:12px;color: #FFF;text-align: center;">乐队!乐队!</p>
+                        <p style="height: 32px;width: 100%;margin: 0;"></p>
+                        <h1 style="margin:0 ;color: #FFF;text-align: center;">最近</h1>
                     </div>
                     <div class="cards" v-for="(item, idx) in items" :key="idx">
-                        <wincard style="width: 200px;">
+                        <p style="text-align: center;">这里还很冷清</p>
+                        <!--<wincard style="width: 200px;">
                             <img style="width: 100%;height: 200px;margin: 0;background-size:cover" alt=""
                                 src="https://ts1.tc.mm.bing.net/th/id/OIP-C.-fHsAekl5M3EtL1t4RZV1AHaHa?rs=1&pid=ImgDetMain&o=7&rm=3"></img>
                             <p style="box-sizing:border-box;padding: 12px 0 0 12px;margin: 0;">影色舞</p>
                             <p style="font-size: small;padding: 4px 0 0 12px;margin: 0;">Mygo!!!!!</p>
-                        </wincard>
+                        </wincard>-->
                     </div>
                     <div style="height: 80px;"></div>
                 </main>
@@ -43,9 +43,10 @@
                 <main class="container-3" v-if="page === 2">
                     <div class="showcase">
                         <p style="height: 32px;width: 100%;margin: 0;"></p>
-                        <h1 style="margin:0 ;color: #FFF;text-align: center;">搜索</h1>
+                        <h1 style="margin:0 ;color: #FFF;text-align: center;">我的库</h1>
                     </div>
-                    <wininputbox placeholder="搜索......" style="margin: auto;display: block;" @change="searchMusic" />
+                    <wininputbox placeholder="从 我的库 搜索......" style="margin: auto;display: block;"
+                        @change="searchMusic" />
                     <p style="text-align: center;">{{ searchError }}</p>
                     <div class="cards" v-for="(item, idx) in searchItems" :key="idx">
                         <wincard style="width: 200px;">
@@ -60,7 +61,7 @@
         </Transition>
         <div class="playing" v-if="isBigMusic === false" @dragover.prevent @drop.prevent="handleDrop">
             <div class="playing-info" @click="isBigMusic = true; openSound()">
-                <img>
+                <img v-bind:src="picture">
                 <div style="height: 50px;">
                     <template v-if="haveSound === true">
                         <p class="playing-name" v-html="musicName"></p>
@@ -80,9 +81,14 @@
             </div>
         </div>
         <div class="big-music" v-if="isBigMusic === true">
+            <img style="opacity:0.75;position: fixed;height: 120%;width: 120%;filter:blur(10px);top:-50px;left: -10px;object-fit: cover;" v-bind:src="picture">
+            <div class="big-music-title">
+                <p class="playing-name-big" v-html="musicName[0]"></p>
+                <p class="playing-author-big" v-html="musicName[1]"></p>
+            </div>
             <div class="big-music-range">
                 <winrange type="range" style="width: 100%;" color="#FFF" :max="100" v-model='CurrentTime'
-                    @input="updateSound($event.target.value)"></winrange>
+                    @input="updateSound($event.target.value)" step="0.01"></winrange>
             </div>
             <div class="big-music-control">
                 <winbutton style="height: 100%;background-color: transparent;width: 50px;padding: 0;"
@@ -102,6 +108,7 @@ import 'web-win-vue/web-win-vue.css'
 import { wintopappbar, wincard, wincombobox, wininputbox, winbutton, winrange } from 'web-win-vue'
 import { ref, TransitionGroup, onMounted, onBeforeUnmount } from 'vue'
 import { Howl, Howler } from 'howler';
+import { parseFile } from 'music-metadata';
 
 console.log('👋 This message is being logged by "App.vue", included via Vite');
 
@@ -114,7 +121,8 @@ let isMaximized = ref(false)
 let isBigMusic = ref(false)
 let CurrentTime = ref(0)
 let haveSound = ref(false)
-let musicName = ref('')
+let musicName = ref(['','',''])
+let picture = ref('')
 
 
 function nextPage(date) {
@@ -154,7 +162,10 @@ let musicFile = ''
 async function openFile(params) {
     const result = await window.electronAPI.showOpenDialog({
         title: '选择文件',
-        properties: ['openFile'] // 允许选择文件
+        properties: ['openFile'], // 允许选择文件
+        filters: [
+            { name: 'Music', extensions: ['mp3'] },
+            { name: 'All Files', extensions: ['*'] }]
     });
     console.log('选中的文件:', result.filePaths);
     return result.filePaths
@@ -174,9 +185,27 @@ async function openSound() {
                 console.error('播放失败：', err);
             }
         });
-        musicName.value = File[0].split('/')[File[0].split('/').length-1]
-        console.log(File[0].split('/')[File[0].split('/').length-1])
-        haveSound.value = true
+        let musicMetadata = (await metadata.parseFile(File[0]))["common"]
+        console.log(musicMetadata)
+        if (musicMetadata.hasOwnProperty('album')) {
+            musicName.value[0] = musicMetadata['album'];
+        } else {
+            musicName.value[0] = File[0].split('/')[File[0].split('/').length - 1];
+        }
+        if (musicMetadata.hasOwnProperty('albumartist')) {
+            musicName.value[1] = musicMetadata['albumartist'];
+        } else {
+            musicName.value[1] = '未知';
+        }
+        if (musicMetadata.hasOwnProperty('picture')) {
+            let picblob = new Blob([musicMetadata['picture'][0]['data']], { type: musicMetadata['picture'][0]['format'] })
+            picture.value = URL.createObjectURL(picblob);
+        } else {
+            picture.value = "https://ts1.tc.mm.bing.net/th/id/OIP-C.-fHsAekl5M3EtL1t4RZV1AHaHa?rs=1&pid=ImgDetMain&o=7&rm=3";
+            //author.value = '未知';
+        }
+        console.log(File[0].split('/')[File[0].split('/').length - 1]);
+        haveSound.value = true;
     }
     setInterval(() => {
         updateWidth();
@@ -191,8 +220,8 @@ async function openSound() {
 }
 
 setInterval(() => {
-        tabPlayIcon();
-    }, 300);
+    tabPlayIcon();
+}, 300);
 
 
 function tabPlayIcon() {
@@ -230,6 +259,22 @@ const handleKeydown = (e) => {
         if (haveSound) {
             playSound()
         }
+    } else if (e.keyCode === 39 || e.key === 'ArrowRight') {
+        if ((sound.seek() + 2.5) <= sound.duration()) {
+            sound.seek(sound.seek() + 2.5);
+            CurrentTime.value = (sound.seek() / sound.duration()) * 100;
+        } else {
+            sound.seek(sound.duration());
+            CurrentTime.value = 100;
+        }
+    } else if (e.keyCode === 37 || e.key === 'ArrowLeft') {
+        if ((sound.seek() - 2.5) >= 0) {
+            sound.seek(sound.seek() - 2.5);
+            CurrentTime.value = (sound.seek() / sound.duration()) * 100;
+        } else {
+            sound.seek(0);
+            CurrentTime.value = 0;
+        }
     }
 };
 
@@ -243,9 +288,28 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="css" scoped>
+.playing-name-big {
+    font-size: 32px;
+    color: #ffffff;
+    margin: 0;
+}
+
+.big-music-title {
+    position: fixed;
+    bottom: 150px;
+    width: calc(100% - 50px);
+    padding: 32px;
+}
+
+.playing-author-big {
+    font-size: 16px;
+    margin: 8px 0 0 0;
+    color: #ffffffb5;
+}
+
 .big-music-range {
     position: fixed;
-    bottom: 125px;
+    bottom: 100px;
     width: calc(100% - 50px);
     padding: 25px;
 }
@@ -260,7 +324,7 @@ onBeforeUnmount(() => {
     display: flex;
     gap: 8px;
     position: fixed;
-    bottom: 75px;
+    bottom: 50px;
     padding: 20px 20px 20px 20px;
 }
 
@@ -277,19 +341,13 @@ onBeforeUnmount(() => {
 .big-music {
     height: 100%;
     width: 100%;
-    background-color: white;
+    background-color: #000000;
+    backdrop-filter: blur(10px);
+    height: 100%;
+    position: fixed;
+    top:0
 }
 
-.big-music::before {
-    background-size: cover;
-    filter: blur(15px);
-    height: calc(100% + 100px);
-    width: calc(100% + 100px);
-    content: '';
-    position: absolute;
-    margin: -50px;
-    background-image: url('https://ts1.tc.mm.bing.net/th/id/OIP-C.-fHsAekl5M3EtL1t4RZV1AHaHa?rs=1&pid=ImgDetMain&o=7&rm=3');
-}
 
 .icon-pause::before {
     content: "\EDB4";
@@ -365,10 +423,6 @@ onBeforeUnmount(() => {
 .playing-name {
     font-size: large;
     margin: 0;
-}
-
-.playing-set-name.playing-name {
-    content: v-bind(musicName);
 }
 
 .playing-info {
@@ -491,5 +545,9 @@ p {
 
 #app::before {
     filter: blur(15px);
+}
+
+* {
+    user-select: none;
 }
 </style>

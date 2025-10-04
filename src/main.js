@@ -1,6 +1,7 @@
 import { app, BrowserWindow,ipcMain, dialog } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
+import { parseFile } from 'music-metadata';
 const ipc = ipcMain
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -88,4 +89,9 @@ ipcMain.handle('show-open-dialog', async (event, options) => {
 ipcMain.handle('show-save-dialog', async (event, options) => {
   const result = await dialog.showSaveDialog(options);
   return result;
+});
+
+ipcMain.handle('parseFileMetadata', async (event, options) => {
+  const metadata = await await parseFile(options);
+  return metadata;
 });
