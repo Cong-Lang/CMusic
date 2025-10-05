@@ -66,7 +66,7 @@
             </div>
         </Transition>
         <div class="playing" v-if="isBigMusic === false" @dragover.prevent @drop.prevent="handleDrop">
-            <div class="playing-info" @click="isBigMusic = true; openSoundAuto()">
+            <div class="playing-info" @click="openSoundAuto()">
                 <img v-bind:src="picture">
                 <div style="height: 50px;">
                     <template v-if="haveSound === true">
@@ -190,18 +190,18 @@ const handleClose = () => {
 let musicFile = ''
 
 async function openFile(params) {
-    while (true) {
-        const result = await window.electronAPI.showOpenDialog({
-            title: '选择文件',
-            properties: ['openFile'], // 允许选择文件
-            filters: [
-                { name: 'Music', extensions: ['mp3'] },
-                { name: 'All Files', extensions: ['*'] }]
-        });
-        if (result.filePaths.length > 0) {
-            console.log('选中的文件:', result.filePaths);
-            return result.filePaths
-        }
+    const result = await window.electronAPI.showOpenDialog({
+        title: '选择文件',
+        properties: ['openFile'], // 允许选择文件
+        filters: [
+            { name: 'Music', extensions: ['mp3'] },
+            { name: 'All Files', extensions: ['*'] }]
+    });
+    if (result.filePaths.length > 0) {
+        console.log('选中的文件:', result.filePaths);
+        return result.filePaths
+    } else {
+        return [null]
     }
 }
 let sound;
@@ -213,6 +213,7 @@ function openSoundAuto() {
     }
 }
 function openSoundUI() {
+    isBigMusic.value = true;
     setInterval(() => {
         updateWidth();
     }, 300);
@@ -228,6 +229,10 @@ async function openSound(File1 = null) {
     let File;
     if (File1 == null) {
         File = (await openFile())[0]
+        console.log(File)
+        if (File == null) {
+            return;
+        }
         if (haveSound.value) {
             sound.unload();
             haveSound.value = false;
@@ -241,6 +246,7 @@ async function openSound(File1 = null) {
             isPlay.value = false
         }
     }
+    isBigMusic.value = true;
     console.log(File)
     if (!haveSound.value) {
         sound = new Howl({
@@ -274,10 +280,10 @@ async function openSound(File1 = null) {
             picture.value = "https://ts1.tc.mm.bing.net/th/id/OIP-C.-fHsAekl5M3EtL1t4RZV1AHaHa?rs=1&pid=ImgDetMain&o=7&rm=3";
             //author.value = '未知';
         }
-        let tempItemsNotFile = {'title': musicName.value[0], 'author': musicName.value[1] }
+        let tempItemsNotFile = { 'title': musicName.value[0], 'author': musicName.value[1] }
         let tempItems = { 'img': picture.value, 'title': musicName.value[0], 'author': musicName.value[1], 'file': File }
-        
-        if (itemsNotFile.value.includes(JSON.stringify(tempItemsNotFile))) { 
+
+        if (itemsNotFile.value.includes(JSON.stringify(tempItemsNotFile))) {
             items.value.splice(itemsNotFile.value.indexOf(JSON.stringify(tempItemsNotFile)), 1)
             itemsNotFile.value.splice(itemsNotFile.value.indexOf(JSON.stringify(tempItemsNotFile)), 1)
             console.log("没意思1")
