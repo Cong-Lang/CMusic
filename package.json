@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "@rollup/plugin-alias": "^5.1.1",
+    "colorfulimg": "^1.0.2",
     "electron-squirrel-startup": "^1.0.1",
     "get-image-colors": "^4.0.1",
     "howler": "^2.2.4",

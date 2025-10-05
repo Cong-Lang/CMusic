@@ -20,7 +20,6 @@ const createWindow = () => {
     webPreferences: {
       preload: path.join(__dirname, "/preload.js"),
       contextIsolation: true,
-      experimentalFeatures: true,
       webSecurity: false,
     },
   });
@@ -111,6 +110,16 @@ ipcMain.handle("read-file", async (event, filePath) => {
     return { success: true, data };
   } catch (error) {
     console.error("读取文件失败", error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('write-file', async (event, filePath, content) => {
+  try {
+    await writeFile(filePath, content, 'utf8');
+    return { success: true, message: '文件写入成功' };
+  } catch (error) {
+    console.error('写入文件失败:', error);
     return { success: false, error: error.message };
   }
 });

@@ -30,14 +30,14 @@
                         <p style="height: 32px;width: 100%;margin: 0;"></p>
                         <h1 style="margin:0 ;color: #FFF;text-align: center;">最近</h1>
                     </div>
-                    <div class="cards" v-for="(item, idx) in items" :key="idx">
-                        <p style="text-align: center;" @click="readFile()">这里还很冷清</p>
-                        <!--<wincard style="width: 200px;">
+                    <p style="text-align: center;" v-if="items.length == 0">这里还很冷清</p>
+                    <div class="cards">
+                        <wincard style="width: 200px;" v-for="(item, idx) in items" :key="idx" @click="openSound(item.file)">
                             <img style="width: 100%;height: 200px;margin: 0;background-size:cover" alt=""
-                                src="https://ts1.tc.mm.bing.net/th/id/OIP-C.-fHsAekl5M3EtL1t4RZV1AHaHa?rs=1&pid=ImgDetMain&o=7&rm=3"></img>
-                            <p style="box-sizing:border-box;padding: 12px 0 0 12px;margin: 0;">影色舞</p>
-                            <p style="font-size: small;padding: 4px 0 0 12px;margin: 0;">Mygo!!!!!</p>
-                        </wincard>-->
+                                :src="item.img"></img>
+                            <p style="box-sizing:border-box;padding: 12px 0 0 12px;margin: 0;">{{ item.title }}</p>
+                            <p style="font-size: small;padding: 4px 0 0 12px;margin: 0;">{{ item.author }}</p>
+                        </wincard>
                     </div>
                     <div style="height: 80px;"></div>
                 </main>
@@ -129,7 +129,7 @@ console.log('👋 This message is being logged by "App.vue", included via Vite')
 
 
 let page = ref(0);
-let items = ref([{}])
+let items = ref([])
 let searchError = ref('')
 let isPlay = ref(false)
 let isMaximized = ref(false)
@@ -192,11 +192,24 @@ async function openFile(params) {
     return result.filePaths
 }
 let sound;
-async function openSound() {
+async function openSound(File1 = null) {
+    let File;
+    if (File1 == null) {
+        if (!haveSound.value) {
+            File = (await openFile())[0]
+        }
+    } else {
+        File = File1
+        if (haveSound.value) {
+            sound.unload();
+            haveSound.value = false;
+            isPlay.value = false
+        }
+    }
+    console.log(File)
     if (!haveSound.value) {
-        let File = await openFile()
         sound = new Howl({
-            src: ['file://' + File[0]],
+            src: ['file://' + File],
             onloaderror: (id, err) => {
                 console.error('音频加载失败：', err);
                 // 常见错误："Failed to load media" 通常是路径无效或权限问题
@@ -204,14 +217,15 @@ async function openSound() {
             // 播放错误回调
             onplayerror: (id, err) => {
                 console.error('播放失败：', err);
-            }
+            },
         });
-        let musicMetadata = (await metadata.parseFile(File[0]))["common"]
+        haveSound.value = true;
+        let musicMetadata = (await metadata.parseFile(File))["common"]
         console.log(musicMetadata)
         if (musicMetadata.hasOwnProperty('album')) {
             musicName.value[0] = musicMetadata['album'];
         } else {
-            musicName.value[0] = File[0].split('/')[File[0].split('/').length - 1];
+            musicName.value[0] = File.split('/')[File.split('/').length - 1];
         }
         if (musicMetadata.hasOwnProperty('albumartist')) {
             musicName.value[1] = musicMetadata['albumartist'];
@@ -225,8 +239,8 @@ async function openSound() {
             picture.value = "https://ts1.tc.mm.bing.net/th/id/OIP-C.-fHsAekl5M3EtL1t4RZV1AHaHa?rs=1&pid=ImgDetMain&o=7&rm=3";
             //author.value = '未知';
         }
-        console.log(File[0].split('/')[File[0].split('/').length - 1]);
-        haveSound.value = true;
+        items.value.push({'img':picture.value,'title':musicName.value[0],'author':musicName.value[1],'file':File})
+        console.log(items.value);
     }
     setInterval(() => {
         updateWidth();

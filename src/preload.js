@@ -25,17 +25,18 @@ contextBridge.exposeInMainWorld("windowControls", {
 
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  // 调用打开对话框的方法（通过 IPC 通知主进程）
   showOpenDialog: (options) => ipcRenderer.invoke('show-open-dialog', options),
-  // 可以添加其他需要的对话框方法（如保存对话框）
   showSaveDialog: (options) => ipcRenderer.invoke('show-save-dialog', options),
   //读取文件
   readFile: (filePath) => {
     return ipcRenderer.invoke('read-file', filePath); 
-  }
+  },
+  writeFile: (filePath, content) => {
+    return ipcRenderer.invoke('write-file', filePath, content)
+  },
 });
 
 contextBridge.exposeInMainWorld('metadata', {
-  // 调用打开对话框的方法（通过 IPC 通知主进程）
   parseFile: (options) => ipcRenderer.invoke('parseFileMetadata', options)
 });
+
