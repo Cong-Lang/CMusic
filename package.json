@@ -22,6 +22,7 @@
     "@electron-forge/maker-deb": "^7.9.0",
     "@electron-forge/maker-rpm": "^7.9.0",
     "@electron-forge/maker-squirrel": "^7.9.0",
+    "@electron-forge/maker-wix": "^7.9.0",
     "@electron-forge/maker-zip": "^7.9.0",
     "@electron-forge/plugin-auto-unpack-natives": "^7.9.0",
     "@electron-forge/plugin-fuses": "^7.9.0",
@@ -37,6 +38,7 @@
     "get-image-colors": "^4.0.1",
     "howler": "^2.2.4",
     "music-metadata-browser": "^2.5.11",
+    "rpmbuild": "^0.0.23",
     "vue": "^3.5.22",
     "web-win-vue": "^0.6.6"
   }

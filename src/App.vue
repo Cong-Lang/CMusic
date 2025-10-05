@@ -1,18 +1,23 @@
 <template>
     <div class="titlebar">
-        <div class="titlebar-button" id="titlebar-back" @click="handleback" v-if="isBigMusic === true">
+        <div class="titlebar-button-left" id="titlebar-back" @click="handleback" v-if="isBigMusic === true">
             <i class="ms-icon icon-back titlebar-icon"></i>
         </div>
         <p class="titlebar-text" :class="String(isBigMusic)">CMusic</p>
-        <div class="titlebar-button" id="titlebar-minimize" @click="handleMinimize">
-            <i class="ms-icon icon-minimize titlebar-icon"></i>
-        </div>
-        <div class="titlebar-button" id="titlebar-maximize" @click='handleMaximize'>
-            <i class="ms-icon icon-maximize titlebar-icon" v-if="isMaximized === false"></i>
-            <i class="ms-icon icon-restore titlebar-icon" v-if="isMaximized === true"></i>
-        </div>
-        <div class="titlebar-button" id="titlebar-close" @click="handleClose">
-            <i class="ms-icon icon-close titlebar-icon"></i>
+        <div style="display: flex;position: fixed;right: 0px;">
+            <div class="titlebar-button" id="titlebar-minimize" @click="handleMinimize">
+                <i class="ms-icon icon-minimize titlebar-icon"></i>
+            </div>
+            <div class="titlebar-button" id="titlebar-maximize" @click='handleMaximize' v-if="isFull === false">
+                <i class="ms-icon icon-maximize titlebar-icon" v-if="isMaximized === false"></i>
+                <i class="ms-icon icon-restore titlebar-icon" v-if="isMaximized === true"></i>
+            </div>
+            <div class="titlebar-button" id="titlebar-maximize" @click='FullScreen()' v-if="isFull === true">
+                <i class="ms-icon icon-back-to-window titlebar-icon"></i>
+            </div>
+            <div class="titlebar-button" id="titlebar-close" @click="handleClose">
+                <i class="ms-icon icon-close titlebar-icon"></i>
+            </div>
         </div>
     </div>
     <TransitionGroup>
@@ -26,7 +31,7 @@
                         <h1 style="margin:0 ;color: #FFF;text-align: center;">最近</h1>
                     </div>
                     <div class="cards" v-for="(item, idx) in items" :key="idx">
-                        <p style="text-align: center;">这里还很冷清</p>
+                        <p style="text-align: center;" @click="readFile()">这里还很冷清</p>
                         <!--<wincard style="width: 200px;">
                             <img style="width: 100%;height: 200px;margin: 0;background-size:cover" alt=""
                                 src="https://ts1.tc.mm.bing.net/th/id/OIP-C.-fHsAekl5M3EtL1t4RZV1AHaHa?rs=1&pid=ImgDetMain&o=7&rm=3"></img>
@@ -64,8 +69,8 @@
                 <img v-bind:src="picture">
                 <div style="height: 50px;">
                     <template v-if="haveSound === true">
-                        <p class="playing-name" v-html="musicName"></p>
-                        <p class="playing-author">未知</p>
+                        <p class="playing-name" v-html="musicName[0]"></p>
+                        <p class="playing-author" v-html="musicName[1]"></p>
                     </template>
                     <template v-if="haveSound === false">
                         <p class="playing-name">暂无播放音乐</p>
@@ -81,7 +86,8 @@
             </div>
         </div>
         <div class="big-music" v-if="isBigMusic === true">
-            <img style="opacity:0.75;position: fixed;height: 120%;width: 120%;filter:blur(10px);top:-50px;left: -10px;object-fit: cover;" v-bind:src="picture">
+            <img style="opacity:0.5;position: fixed;height: 120%;width: 120%;filter:blur(10px);top:-50px;left: -10px;object-fit: cover;"
+                v-bind:src="picture">
             <div class="big-music-title">
                 <p class="playing-name-big" v-html="musicName[0]"></p>
                 <p class="playing-author-big" v-html="musicName[1]"></p>
@@ -91,11 +97,20 @@
                     @input="updateSound($event.target.value)" step="0.01"></winrange>
             </div>
             <div class="big-music-control">
-                <winbutton style="height: 100%;background-color: transparent;width: 50px;padding: 0;"
-                    @click="playSound();">
-                    <i class="ms-icon icon-play playing-start-big" v-if="isPlay === false"></i>
-                    <i class="ms-icon icon-pause playing-start-big" v-if="isPlay === true"></i>
-                </winbutton>
+                <div class="big-music-control-left">
+                    <winbutton style="height: 100%;background-color: transparent;width: 50px;padding: 0;"
+                        @click="playSound();">
+                        <i class="ms-icon icon-play playing-start-big" v-if="isPlay === false"></i>
+                        <i class="ms-icon icon-pause playing-start-big" v-if="isPlay === true"></i>
+                    </winbutton>
+                </div>
+                <div class="big-music-control-right">
+                    <winbutton style="height: 100%;background-color: transparent;width: 50px;padding: 0;"
+                        @click="FullScreen()">
+                        <i class="ms-icon icon-full-screen playing-start-big" v-if="isFull === false"></i>
+                        <i class="ms-icon icon-back-to-window playing-start-big" v-if="isFull === true"></i>
+                    </winbutton>
+                </div>
             </div>
         </div>
     </TransitionGroup>
@@ -121,9 +136,15 @@ let isMaximized = ref(false)
 let isBigMusic = ref(false)
 let CurrentTime = ref(0)
 let haveSound = ref(false)
-let musicName = ref(['','',''])
+let musicName = ref(['', '', ''])
 let picture = ref('')
+let isFull = ref(false)
 
+
+function FullScreen() {
+    windowControls.fullscreen()
+    isFull.value = !isFull.value
+}
 
 function nextPage(date) {
     searchError.value = '';
@@ -278,6 +299,10 @@ const handleKeydown = (e) => {
     }
 };
 
+async function readFile() {
+    console.log(await electronAPI.readFile('/home/hhcl233/下载/1111.txt'))
+}
+
 onMounted(() => {
     document.addEventListener('keydown', handleKeydown);
 });
@@ -288,6 +313,17 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="css" scoped>
+.big-music-control-left {
+    display: flex;
+    flex: 2;
+}
+
+.big-music-control-right {
+    display: flex;
+    flex: 1;
+    justify-content: flex-end;
+}
+
 .playing-name-big {
     font-size: 32px;
     color: #ffffff;
@@ -326,6 +362,7 @@ onBeforeUnmount(() => {
     position: fixed;
     bottom: 50px;
     padding: 20px 20px 20px 20px;
+    width: calc(100% - 40px);
 }
 
 #titlebar-back {
@@ -345,9 +382,17 @@ onBeforeUnmount(() => {
     backdrop-filter: blur(10px);
     height: 100%;
     position: fixed;
-    top:0
+    top: 0
 }
 
+.icon-back-to-window::before {
+    content: "\E73F";
+}
+
+
+.icon-full-screen::before {
+    content: "\E740";
+}
 
 .icon-pause::before {
     content: "\EDB4";
@@ -506,6 +551,18 @@ onBeforeUnmount(() => {
     -webkit-user-select: none;
     -webkit-app-region: no-drag;
     float: right;
+}
+
+.titlebar-button-left {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 48px;
+    height: 36px;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-app-region: no-drag;
+    float: left;
 }
 
 .titlebar-button:hover {
