@@ -32,7 +32,8 @@
                     </div>
                     <p style="text-align: center;" v-if="items.length == 0">这里还很冷清</p>
                     <div class="cards">
-                        <wincard style="width: 200px;" v-for="(item, idx) in items" :key="idx" @click="openSound(item.file)">
+                        <wincard style="width: 200px;" v-for="(item, idx) in items" :key="idx"
+                            @click="openSound(item.file)">
                             <img style="width: 100%;height: 200px;margin: 0;background-size:cover" alt=""
                                 :src="item.img"></img>
                             <p style="box-sizing:border-box;padding: 12px 0 0 12px;margin: 0;">{{ item.title }}</p>
@@ -65,7 +66,7 @@
             </div>
         </Transition>
         <div class="playing" v-if="isBigMusic === false" @dragover.prevent @drop.prevent="handleDrop">
-            <div class="playing-info" @click="isBigMusic = true; openSound()">
+            <div class="playing-info" @click="isBigMusic = true; openSoundAuto()">
                 <img v-bind:src="picture">
                 <div style="height: 50px;">
                     <template v-if="haveSound === true">
@@ -83,7 +84,14 @@
                     <i class="ms-icon icon-play playing-start" v-if="isPlay === false"></i>
                     <i class="ms-icon icon-pause playing-start" v-if="isPlay === true"></i>
                 </winbutton>
+                <winbutton style="height: 100%;background-color: transparent;width: 75px;" @click="openSound()">
+                    <i class="ms-icon icon-upload playing-start"></i>
+                </winbutton>
             </div>
+            <div
+                style="z-index: -1;backdrop-filter: blur(15px);background-color: transparent;position:absolute;height: 100%;width: 100%;display: block;">
+            </div>
+            <img class="playing-img" v-bind:src="picture">
         </div>
         <div class="big-music" v-if="isBigMusic === true">
             <img style="opacity:0.5;position: fixed;height: 120%;width: 120%;filter:blur(10px);top:-50px;left: -10px;object-fit: cover;"
@@ -130,6 +138,7 @@ console.log('👋 This message is being logged by "App.vue", included via Vite')
 
 let page = ref(0);
 let items = ref([])
+let itemsNotFile = ref([])
 let searchError = ref('')
 let isPlay = ref(false)
 let isMaximized = ref(false)
@@ -181,22 +190,48 @@ const handleClose = () => {
 let musicFile = ''
 
 async function openFile(params) {
-    const result = await window.electronAPI.showOpenDialog({
-        title: '选择文件',
-        properties: ['openFile'], // 允许选择文件
-        filters: [
-            { name: 'Music', extensions: ['mp3'] },
-            { name: 'All Files', extensions: ['*'] }]
-    });
-    console.log('选中的文件:', result.filePaths);
-    return result.filePaths
+    while (true) {
+        const result = await window.electronAPI.showOpenDialog({
+            title: '选择文件',
+            properties: ['openFile'], // 允许选择文件
+            filters: [
+                { name: 'Music', extensions: ['mp3'] },
+                { name: 'All Files', extensions: ['*'] }]
+        });
+        if (result.filePaths.length > 0) {
+            console.log('选中的文件:', result.filePaths);
+            return result.filePaths
+        }
+    }
 }
 let sound;
+function openSoundAuto() {
+    if (haveSound.value) {
+        openSoundUI()
+    } else {
+        openSound()
+    }
+}
+function openSoundUI() {
+    setInterval(() => {
+        updateWidth();
+    }, 300);
+
+    function updateWidth() {
+        if (sound.playing()) {
+            CurrentTime.value = (sound.seek() / sound.duration()) * 100
+            let width = (sound.seek() / sound.duration()) * 100;
+        }
+    }
+}
 async function openSound(File1 = null) {
     let File;
     if (File1 == null) {
-        if (!haveSound.value) {
-            File = (await openFile())[0]
+        File = (await openFile())[0]
+        if (haveSound.value) {
+            sound.unload();
+            haveSound.value = false;
+            isPlay.value = false
         }
     } else {
         File = File1
@@ -239,21 +274,21 @@ async function openSound(File1 = null) {
             picture.value = "https://ts1.tc.mm.bing.net/th/id/OIP-C.-fHsAekl5M3EtL1t4RZV1AHaHa?rs=1&pid=ImgDetMain&o=7&rm=3";
             //author.value = '未知';
         }
-        items.value.push({'img':picture.value,'title':musicName.value[0],'author':musicName.value[1],'file':File})
-        console.log(items.value);
-    }
-    setInterval(() => {
-        updateWidth();
-    }, 300);
-
-    function updateWidth() {
-        if (sound.playing()) {
-            CurrentTime.value = (sound.seek() / sound.duration()) * 100
-            let width = (sound.seek() / sound.duration()) * 100;
+        let tempItemsNotFile = {'title': musicName.value[0], 'author': musicName.value[1] }
+        let tempItems = { 'img': picture.value, 'title': musicName.value[0], 'author': musicName.value[1], 'file': File }
+        
+        if (itemsNotFile.value.includes(JSON.stringify(tempItemsNotFile))) { 
+            items.value.splice(itemsNotFile.value.indexOf(JSON.stringify(tempItemsNotFile)), 1)
+            itemsNotFile.value.splice(itemsNotFile.value.indexOf(JSON.stringify(tempItemsNotFile)), 1)
+            console.log("没意思1")
         }
+        items.value.unshift(tempItems)
+        itemsNotFile.value.unshift(JSON.stringify(tempItemsNotFile))
+        console.log('有意思')
+        console.log(itemsNotFile.value)
+        console.log(!itemsNotFile.value.includes(tempItemsNotFile))
     }
 }
-
 setInterval(() => {
     tabPlayIcon();
 }, 300);
@@ -324,6 +359,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
     document.removeEventListener('keydown', handleKeydown);
 });
+
 </script>
 
 <style lang="css" scoped>
@@ -412,6 +448,10 @@ onBeforeUnmount(() => {
     content: "\EDB4";
 }
 
+.icon-upload::before {
+    content: "\E898";
+}
+
 .icon-play::before {
     content: "\EDB5";
 }
@@ -447,19 +487,30 @@ onBeforeUnmount(() => {
     font-size: x-small;
 }
 
+.playing-img {
+    object-fit: cover;
+    opacity: 0.75;
+    background-color: #0378d7;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: -2;
+    border: none;
+}
+
 .playing {
     height: 75px;
     position: fixed;
     z-index: 999;
     bottom: 0;
-    background-color: #0378d773;
+    background-color: transparent;
     width: calc(100% - 24px);
-    backdrop-filter: blur(5px);
     /*padding: 12px 12px 12px 12px;*/
     display: flex;
     gap: 8px;
     width: 100%;
     align-items: center;
+    border: none;
 }
 
 .playing-info img {
@@ -467,6 +518,7 @@ onBeforeUnmount(() => {
     height: 75px;
     width: 75px;
     background-size: cover;
+    border: none;
 }
 
 .playing-info:hover {
@@ -476,6 +528,7 @@ onBeforeUnmount(() => {
 .playing-info {
     padding: 0 16px 0 0px;
     display: flex;
+    border: none;
     align-items: center
 }
 
@@ -507,11 +560,13 @@ onBeforeUnmount(() => {
 .cards {
     margin-top: 24px;
     justify-content: center;
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 2fr));
     gap: 12px;
     flex-wrap: wrap;
     margin-bottom: 24px;
     margin-left: 4px;
+    place-items: center;
     margin-right: 4px;
 }
 

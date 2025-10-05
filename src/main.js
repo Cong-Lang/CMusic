@@ -90,8 +90,12 @@ app.on("window-all-closed", () => {
 // 监听渲染进程的对话框请求（主进程处理）
 ipcMain.handle("show-open-dialog", async (event, options) => {
   // 调用对话框并返回结果
-  const result = await dialog.showOpenDialog(options);
-  return result;
+  try {
+    const result = (await dialog.showOpenDialog(options));
+    return result;
+  } catch (error) {
+    return null;
+  }
 });
 
 ipcMain.handle("parseFileMetadata", async (event, options) => {
