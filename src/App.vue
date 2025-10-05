@@ -620,7 +620,7 @@ onBeforeUnmount(() => {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    width: 48px;
+    width: 45px;
     height: 36px;
     user-select: none;
     -webkit-user-select: none;
@@ -632,7 +632,7 @@ onBeforeUnmount(() => {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    width: 48px;
+    width: 45px;
     height: 36px;
     user-select: none;
     -webkit-user-select: none;
