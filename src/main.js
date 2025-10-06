@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain, dialog } from "electron";
 import path from "node:path";
 import started from "electron-squirrel-startup";
 import { parseFile } from "music-metadata";
-import * as fs from 'fs/promises';
+import * as fs from "fs/promises";
 const ipc = ipcMain;
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -14,12 +14,14 @@ const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    titleBarStyle: 'hidden',
+    ...(process.platform === "win32"
+      ? { titleBarStyle: "hidden" }
+      : { frame: false }),
     // expose window controls in Windows/Linux
-    ...(process.platform !== 'darwin' ? { titleBarOverlay: true } : {}),
+    ...(process.platform !== "darwin" ? { titleBarOverlay: true } : {}),
     transparent: true,
     titleBarOverlay: {
-      height: 36
+      height: 36,
     },
     icon: path.join(__dirname, "/assets/logo.png"),
     webPreferences: {
@@ -96,7 +98,7 @@ app.on("window-all-closed", () => {
 ipcMain.handle("show-open-dialog", async (event, options) => {
   // 调用对话框并返回结果
   try {
-    const result = (await dialog.showOpenDialog(options));
+    const result = await dialog.showOpenDialog(options);
     return result;
   } catch (error) {
     return null;
@@ -123,12 +125,12 @@ ipcMain.handle("read-file", async (event, filePath) => {
   }
 });
 
-ipcMain.handle('write-file', async (event, filePath, content) => {
+ipcMain.handle("write-file", async (event, filePath, content) => {
   try {
-    await writeFile(filePath, content, 'utf8');
-    return { success: true, message: '文件写入成功' };
+    await writeFile(filePath, content, "utf8");
+    return { success: true, message: "文件写入成功" };
   } catch (error) {
-    console.error('写入文件失败:', error);
+    console.error("写入文件失败:", error);
     return { success: false, error: error.message };
   }
 });
