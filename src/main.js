@@ -19,7 +19,6 @@ const createWindow = () => {
       : { frame: false }),
     // expose window controls in Windows/Linux
     ...(process.platform !== "darwin" ? { titleBarOverlay: true } : {}),
-    transparent: true,
     titleBarOverlay: {
       height: 36,
     },

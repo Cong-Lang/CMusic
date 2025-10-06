@@ -294,17 +294,21 @@ async function openSound(File1 = null) {
         console.log(itemsNotFile.value)
         console.log(!itemsNotFile.value.includes(tempItemsNotFile))
     }
+
 }
 setInterval(() => {
     tabPlayIcon();
-}, 300);
+}, 100);
 
 
 function tabPlayIcon() {
     if (haveSound.value) {
         sound.on('end', () => {
-            isPlay.value = false
+            isPlay.value = false;
         });
+        if (sound.playing()) {
+            CurrentTime.value = (sound.seek() / sound.duration()) * 100
+        }
     }
 }
 
@@ -327,8 +331,6 @@ function playSound() {
         isPlay.value = false
     }
 }
-
-console.log(CurrentTime.value)
 
 const handleKeydown = (e) => {
     if (e.keyCode === 32 || e.key === ' ') {
