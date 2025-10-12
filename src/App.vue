@@ -204,6 +204,17 @@ async function openFile(params) {
         return [null]
     }
 }
+function toBase64(buffer) {
+    var binary = '';
+    var bytes = new Uint8Array(buffer);
+    var len = bytes.byteLength;
+
+    for (var i = 0; i < len; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+
+    return window.btoa(binary);
+}
 let sound;
 function openSoundAuto() {
     if (haveSound.value) {
@@ -214,17 +225,17 @@ function openSoundAuto() {
 }
 function openSoundUI() {
     isBigMusic.value = true;
-    setInterval(() => {
-        updateWidth();
-    }, 300);
-
-    function updateWidth() {
-        if (sound.playing()) {
-            CurrentTime.value = (sound.seek() / sound.duration()) * 100
-            let width = (sound.seek() / sound.duration()) * 100;
-        }
-    }
 }
+
+function isObjectInArray(array, target) {
+    return array.some(item =>
+        Object.keys(target).every(key => item[key] === target[key])
+    );
+}
+function findObjectIndex(array, target, key = 'id') {
+    return array.findIndex(item => item[key] === target[key]);
+}
+
 async function openSound(File1 = null) {
     let File;
     if (File1 == null) {
@@ -236,14 +247,16 @@ async function openSound(File1 = null) {
         if (haveSound.value) {
             sound.unload();
             haveSound.value = false;
-            isPlay.value = false
+            isPlay.value = false;
+            CurrentTime.value = 0;
         }
     } else {
         File = File1
         if (haveSound.value) {
             sound.unload();
             haveSound.value = false;
-            isPlay.value = false
+            isPlay.value = false;
+            CurrentTime.value = 0;
         }
     }
     isBigMusic.value = true;
@@ -274,25 +287,17 @@ async function openSound(File1 = null) {
             musicName.value[1] = '未知';
         }
         if (musicMetadata.hasOwnProperty('picture')) {
-            let picblob = new Blob([musicMetadata['picture'][0]['data']], { type: musicMetadata['picture'][0]['format'] })
-            picture.value = URL.createObjectURL(picblob);
+            picture.value = 'data:' + musicMetadata['picture'][0]['format'] + ';base64,' + toBase64(musicMetadata['picture'][0]['data']);
         } else {
-            picture.value = "https://ts1.tc.mm.bing.net/th/id/OIP-C.-fHsAekl5M3EtL1t4RZV1AHaHa?rs=1&pid=ImgDetMain&o=7&rm=3";
+            picture.value = "";
             //author.value = '未知';
         }
-        let tempItemsNotFile = { 'title': musicName.value[0], 'author': musicName.value[1] }
         let tempItems = { 'img': picture.value, 'title': musicName.value[0], 'author': musicName.value[1], 'file': File }
-
-        if (itemsNotFile.value.includes(JSON.stringify(tempItemsNotFile))) {
-            items.value.splice(itemsNotFile.value.indexOf(JSON.stringify(tempItemsNotFile)), 1)
-            itemsNotFile.value.splice(itemsNotFile.value.indexOf(JSON.stringify(tempItemsNotFile)), 1)
-            console.log("没意思1")
+        if (isObjectInArray(items.value, tempItems)) {
+            items.value.splice(findObjectIndex(items.value, tempItems, 'title'), 1)
         }
         items.value.unshift(tempItems)
-        itemsNotFile.value.unshift(JSON.stringify(tempItemsNotFile))
-        console.log('有意思')
-        console.log(itemsNotFile.value)
-        console.log(!itemsNotFile.value.includes(tempItemsNotFile))
+        writeFile(JSON.stringify(items.value, null, 4))
     }
 
 }
@@ -356,8 +361,12 @@ const handleKeydown = (e) => {
     }
 };
 
+async function writeFile(fileText) {
+    return await electronAPI.writeFile('.cmusic', fileText)
+}
+
 async function readFile() {
-    console.log(await electronAPI.readFile('/home/hhcl233/下载/1111.txt'))
+    return await electronAPI.readFile('.cmusic')
 }
 
 onMounted(() => {
@@ -368,6 +377,11 @@ onBeforeUnmount(() => {
     document.removeEventListener('keydown', handleKeydown);
 });
 
+async function start() {
+    items.value = JSON.parse((await readFile())['data'])
+}
+
+start()
 </script>
 
 <style lang="css" scoped>
@@ -622,8 +636,8 @@ onBeforeUnmount(() => {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    width: 45px;
-    height: 36px;
+    width: 47px;
+    height: 32px;
     user-select: none;
     -webkit-user-select: none;
     -webkit-app-region: no-drag;
@@ -634,8 +648,8 @@ onBeforeUnmount(() => {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    width: 45px;
-    height: 36px;
+    width: 47px;
+    height: 32px;
     user-select: none;
     -webkit-user-select: none;
     -webkit-app-region: no-drag;
@@ -647,7 +661,8 @@ onBeforeUnmount(() => {
 }
 
 .titlebar-button#titlebar-close:hover {
-    background: #cf0000;
+    background: #ce2e2e;
+    color: #ffffff;
 }
 
 .titlebar-text {

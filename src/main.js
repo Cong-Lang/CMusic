@@ -3,10 +3,37 @@ import path from "node:path";
 import started from "electron-squirrel-startup";
 import { parseFile } from "music-metadata";
 import * as fs from "fs/promises";
+import * as os from "os";
 const ipc = ipcMain;
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
   app.quit();
+}
+
+function getDocumentsFolder(directory) {
+  const platform = os.platform();
+  const homeDir = os.homedir();
+
+  if (platform === "win32") {
+    // Windows系统
+    return path.join(homeDir, directory);
+  } else if (platform === "darwin") {
+    // macOS系统
+    return path.join(homeDir, directory);
+  } else {
+    // Linux及其他类Unix系统
+    return path.join(homeDir, directory);
+  }
+}
+
+function access(directory) {
+  fs.access(directory, fs.constants.F_OK, (err) => {
+    if (err) {
+      return false;
+    } else {
+      return true;
+    }
+  });
 }
 
 const createWindow = () => {
@@ -115,8 +142,9 @@ ipcMain.handle("toggle-fullscreen", async (event) => {
 });
 
 ipcMain.handle("read-file", async (event, filePath) => {
+  console.log(getDocumentsFolder(filePath));
   try {
-    const data = await fs.readFile(filePath, "utf8");
+    const data = await fs.readFile(getDocumentsFolder(filePath), "utf8");
     return { success: true, data };
   } catch (error) {
     console.error("读取文件失败", error);
@@ -126,7 +154,7 @@ ipcMain.handle("read-file", async (event, filePath) => {
 
 ipcMain.handle("write-file", async (event, filePath, content) => {
   try {
-    await writeFile(filePath, content, "utf8");
+    await fs.writeFile(getDocumentsFolder(filePath), content, "utf8");
     return { success: true, message: "文件写入成功" };
   } catch (error) {
     console.error("写入文件失败:", error);
