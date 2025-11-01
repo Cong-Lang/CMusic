@@ -92,7 +92,7 @@
                 </winbutton>
             </div>
             <div
-                style="z-index: -1;backdrop-filter: blur(20px);background-color: transparent;position:absolute;height: 100%;width: 100%;display: block;">
+                style="z-index: -1;backdrop-filter: blur(20px);background-color: #3d3d3d78;position:absolute;height: 100%;width: 100%;display: block;">
             </div>
             <img class="playing-img" v-bind:src="picture">
         </div>
@@ -104,7 +104,7 @@
                 <p class="playing-author-big" v-html="musicName[1]"></p>
             </div>
             <div class="big-music-range">
-                <winrange type="range" style="width: 100%;" color="#FFF" :max="100" v-model='CurrentTime'
+                <winrange type="range" style="width: 100%;" color="#FFF" :max="100" :min="0" v-model='CurrentTime'
                     @input="updateSound($event.target.value)" step="0.01"></winrange>
             </div>
             <div class="big-music-control">
