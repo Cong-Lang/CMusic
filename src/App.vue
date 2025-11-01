@@ -20,6 +20,9 @@
             </div>
         </div>
     </div>
+    <winwindow :items="[{ 'text': '确定' }, { 'text': '确定' }]" ref="window1" title="设置">
+        这里还很冷清
+    </winwindow>
     <TransitionGroup>
         <wintopappbar style="top:36px" :items="[{ 'name': '最近' }, { 'name': '我的库' }]" :rightMenu="[{ 'name': '设置' }]"
             @update="nextPage" v-if="isBigMusic === false" />
@@ -89,7 +92,7 @@
                 </winbutton>
             </div>
             <div
-                style="z-index: -1;backdrop-filter: blur(15px);background-color: transparent;position:absolute;height: 100%;width: 100%;display: block;">
+                style="z-index: -1;backdrop-filter: blur(20px);background-color: transparent;position:absolute;height: 100%;width: 100%;display: block;">
             </div>
             <img class="playing-img" v-bind:src="picture">
         </div>
@@ -128,11 +131,12 @@
 import './assets/fonts/fonts.css';
 import 'web-win-vue/web-win-vue.css'
 
-import { wintopappbar, wincard, wincombobox, wininputbox, winbutton, winrange } from 'web-win-vue'
+import { winwindow, wintopappbar, wincard, wincombobox, wininputbox, winbutton, winrange } from 'web-win-vue'
 import { ref, TransitionGroup, onMounted, onBeforeUnmount } from 'vue'
 import { Howl, Howler } from 'howler';
 import { parseFile } from 'music-metadata';
 
+const window1 = ref(null);
 console.log('👋 This message is being logged by "App.vue", included via Vite');
 
 
@@ -158,7 +162,7 @@ function FullScreen() {
 function nextPage(date) {
     searchError.value = '';
     if (date[1] === 'right' && date[0] === 0) {
-        page.value = 1
+        window1.value.showDialog();
     } else if (date[1] === 'left' && date[0] === 1) {
         page.value = 2
     } else {
@@ -511,7 +515,7 @@ start()
 
 .playing-img {
     object-fit: cover;
-    opacity: 0.75;
+    opacity: 0.65;
     background-color: #0378d7;
     height: 100%;
     width: 100%;
@@ -523,7 +527,7 @@ start()
 .playing {
     height: 75px;
     position: fixed;
-    z-index: 999;
+    z-index: 100;
     bottom: 0;
     background-color: transparent;
     width: calc(100% - 24px);
@@ -680,6 +684,19 @@ start()
 
 #titlebar-minimize {
     margin-left: auto
+}
+
+@media (prefers-color-scheme: dark) {
+
+    .container-1,
+    .container-2,
+    .container-3 {
+        background-color: rgb(0, 0, 0);
+    }
+
+    .titlebar {
+        color: #ffffff;
+    }
 }
 
 h1,

@@ -39,8 +39,10 @@ function access(directory) {
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1300,
+    height: 800,
+    minWidth: 800,
+    minHeight: 600,
     ...(process.platform === "win32"
       ? { titleBarStyle: "hidden" }
       : { frame: false }),
