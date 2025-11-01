@@ -35,12 +35,16 @@
                     </div>
                     <p style="text-align: center;" v-if="items.length == 0">这里还很冷清</p>
                     <div class="cards">
-                        <wincard style="width: 200px;" v-for="(item, idx) in items" :key="idx"
-                            @click="openSound(item.file)">
-                            <img style="width: 100%;height: 200px;margin: 0;background-size:cover" alt=""
-                                :src="item.img"></img>
+                        <wincard style="width: 200px;background-color: transparent !important;position:relative"
+                            v-for="(item, idx) in items" :key="idx" @click="openSound(item.file)">
+                            <img style="width: 200px;height: 200px;margin: 0;background-size:cover;z-index: 1;position:relative;"
+                                alt="" :src="item.img" class="card-img"></img>
+                            <img style="width: 225px;height: 225px;margin: 0;background-size:cover;position: absolute;left: -12.5px;top:-12.5px;z-index: 0;filter: blur(12px);pointer-events: none;opacity: 0;transition: all 0.5s;"
+                                alt="" :src="item.img" class="card-img-gloss"></img>
                             <p style="box-sizing:border-box;padding: 12px 0 0 12px;margin: 0;">{{ item.title }}</p>
-                            <p style="font-size: small;padding: 4px 0 0 12px;margin: 0;">{{ item.author }}</p>
+                            <p style="font-size: small;padding: 4px 0 0 12px;margin: 0;color: #646464;">{{ item.author
+                                }}
+                            </p>
                         </wincard>
                     </div>
                     <div style="height: 80px;"></div>
@@ -58,7 +62,7 @@
                         @change="searchMusic" />
                     <p style="text-align: center;">{{ searchError }}</p>
                     <div class="cards" v-for="(item, idx) in searchItems" :key="idx">
-                        <wincard style="width: 200px;">
+                        <wincard style="width: 200px;background-color: transparent !important;">
                             <img style="width: 100%;height: 200px;margin: 0;background-size:cover" alt=""
                                 :src="item.img"></img>
                             <p style="box-sizing:border-box;padding: 12px 0 0 12px;margin: 0;">{{ item.title }}</p>
@@ -594,6 +598,10 @@ start()
     margin-left: 4px;
     place-items: center;
     margin-right: 4px;
+}
+
+.card-img:hover~.card-img-gloss {
+    opacity: 0.65 !important;
 }
 
 .container-2 {
