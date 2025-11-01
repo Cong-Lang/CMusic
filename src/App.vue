@@ -281,8 +281,8 @@ async function openSound(File1 = null) {
         } else {
             musicName.value[0] = File.split('/')[File.split('/').length - 1];
         }
-        if (musicMetadata.hasOwnProperty('albumartist')) {
-            musicName.value[1] = musicMetadata['albumartist'];
+        if (musicMetadata.hasOwnProperty('artist')) {
+            musicName.value[1] = musicMetadata['artist'];
         } else {
             musicName.value[1] = '未知';
         }
