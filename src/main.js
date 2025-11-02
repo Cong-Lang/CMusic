@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, dialog } from "electron";
+import { app, BrowserWindow, ipcMain, dialog, shell } from "electron";
 import path from "node:path";
 import started from "electron-squirrel-startup";
 import { parseFile } from "music-metadata";
@@ -51,7 +51,7 @@ const createWindow = () => {
     titleBarOverlay: {
       height: 36,
     },
-    icon: path.join(__dirname, "/assets/logo.png"),
+    icon: path.join(__dirname, "assets/logo.png"),
     webPreferences: {
       preload: path.join(__dirname, "/preload.js"),
       contextIsolation: true,
@@ -93,6 +93,11 @@ const createWindow = () => {
   ipcMain.on("toggle-fullscreen", (event, arg) => {
     mainWindow.setFullScreen(!mainWindow.isFullScreen());
     return mainWindow.isFullScreen();
+  });
+
+  ipcMain.on('restart-app', () => {
+    mainWindow.relaunch(); // 重新启动应用
+    mainWindow.exit(); // 退出当前实例
   });
 };
 
@@ -162,4 +167,15 @@ ipcMain.handle("write-file", async (event, filePath, content) => {
     console.error("写入文件失败:", error);
     return { success: false, error: error.message };
   }
+});
+
+ipcMain.handle('open-file', (event, filePath) => {
+  console.log(12)
+  shell.openPath(getDocumentsFolder(filePath))
+    .then(() => {
+      return { success: true, message: "文件打开成功" };
+    })
+    .catch(err => {
+      return { success: false, error: err.message };
+    });
 });

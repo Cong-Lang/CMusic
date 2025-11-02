@@ -21,6 +21,7 @@ contextBridge.exposeInMainWorld("windowControls", {
       callback(isMaximized);
     });
   },
+  minimize: () => ipcRenderer.send("restart-app"),
 });
 
 
@@ -29,10 +30,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
   showSaveDialog: (options) => ipcRenderer.invoke('show-save-dialog', options),
   //读取文件
   readFile: (filePath) => {
-    return ipcRenderer.invoke('read-file', filePath); 
+    return ipcRenderer.invoke('read-file', filePath);
   },
   writeFile: (filePath, content) => {
-    return ipcRenderer.invoke('write-file', filePath, content)
+    return ipcRenderer.invoke('write-file', filePath, content);
+  },
+  openFile: (filePath) => {
+    return ipcRenderer.invoke('open-file', filePath);
   },
 });
 

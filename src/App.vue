@@ -21,7 +21,8 @@
         </div>
     </div>
     <winwindow :items="[{ 'text': '确定' }, { 'text': '确定' }]" ref="window1" title="设置">
-        这里还很冷清
+        <h5 style="font-weight: normal;margin: 0 0 16px 0;">高级</h5>
+        <winbutton @click="openConf()">打开配置文件</winbutton>
     </winwindow>
     <TransitionGroup>
         <wintopappbar style="top:36px" :items="[{ 'name': '最近' }, { 'name': '我的库' }]" :rightMenu="[{ 'name': '设置' }]"
@@ -43,7 +44,7 @@
                                 alt="" :src="item.img" class="card-img-gloss"></img>
                             <p style="box-sizing:border-box;padding: 12px 0 0 12px;margin: 0;">{{ item.title }}</p>
                             <p style="font-size: small;padding: 4px 0 0 12px;margin: 0;color: #646464;">{{ item.author
-                                }}
+                            }}
                             </p>
                         </wincard>
                     </div>
@@ -137,8 +138,7 @@ import 'web-win-vue/web-win-vue.css'
 
 import { winwindow, wintopappbar, wincard, wincombobox, wininputbox, winbutton, winrange } from 'web-win-vue'
 import { ref, TransitionGroup, onMounted, onBeforeUnmount } from 'vue'
-import { Howl, Howler } from 'howler';
-import { parseFile } from 'music-metadata';
+import { Howl } from 'howler';
 
 const window1 = ref(null);
 console.log('👋 This message is being logged by "App.vue", included via Vite');
@@ -146,7 +146,6 @@ console.log('👋 This message is being logged by "App.vue", included via Vite')
 
 let page = ref(0);
 let items = ref([])
-let itemsNotFile = ref([])
 let searchError = ref('')
 let isPlay = ref(false)
 let isMaximized = ref(false)
@@ -157,6 +156,9 @@ let musicName = ref(['', '', ''])
 let picture = ref('')
 let isFull = ref(false)
 
+function openConf() {
+    window.electronAPI.openFile('.cmusic')
+}
 
 function FullScreen() {
     windowControls.fullscreen()
@@ -174,7 +176,7 @@ function nextPage(date) {
     };
 };
 function searchMusic(content) {
-    searchError.value = 'Error: 请设置在线服务';
+    searchError.value = 'Error: 请设置库文件夹';
 }
 
 const handleMinimize = () => {
@@ -183,6 +185,7 @@ const handleMinimize = () => {
 
 const handleback = () => {
     isBigMusic.value = false
+    nextPage([0, 'left'])
 }
 
 const handleMaximize = () => {
@@ -195,7 +198,6 @@ const handleClose = () => {
     window.windowControls.close()
 }
 
-let musicFile = ''
 
 async function openFile(params) {
     const result = await window.electronAPI.showOpenDialog({
@@ -713,6 +715,7 @@ h3,
 h4,
 h5,
 h6,
+h5,
 p {
     font-family: 'SourceHanSansSC';
 }
