@@ -36,11 +36,12 @@
                     </div>
                     <p style="text-align: center;" v-if="items.length == 0">这里还很冷清</p>
                     <div class="cards">
-                        <wincard style="width: 200px;background-color: transparent !important;position:relative"
+                        <wincard
+                            style="width: 200px;background-color: transparent !important;position:relative;overflow: hidden; "
                             v-for="(item, idx) in items" :key="idx" @click="openSound(item.file)">
                             <img style="width: 200px;height: 200px;margin: 0;background-size:cover;z-index: 1;position:relative;"
                                 alt="" :src="item.img" class="card-img"></img>
-                            <img style="width: 225px;height: 225px;margin: 0;background-size:cover;position: absolute;left: -12.5px;top:-12.5px;z-index: 0;filter: blur(12px);pointer-events: none;opacity: 0;transition: all 0.5s;"
+                            <img style="width: 200px;height: 200px;margin: 0;background-size:128px;position: absolute;left: 0px;top:0px;z-index: 0;filter: blur(16px);pointer-events: none;opacity: 0;transition: all 0.5s;"
                                 alt="" :src="item.img" class="card-img-gloss"></img>
                             <p style="box-sizing:border-box;padding: 12px 0 0 12px;margin: 0;">{{ item.title }}</p>
                             <p style="font-size: small;padding: 4px 0 0 12px;margin: 0;color: #646464;">{{ item.author
