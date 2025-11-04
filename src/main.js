@@ -96,8 +96,7 @@ const createWindow = () => {
   });
 
   ipcMain.on('restart-app', () => {
-    mainWindow.relaunch(); // 重新启动应用
-    mainWindow.exit(); // 退出当前实例
+    mainWindow.reload();
   });
 };
 

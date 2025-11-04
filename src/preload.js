@@ -21,7 +21,7 @@ contextBridge.exposeInMainWorld("windowControls", {
       callback(isMaximized);
     });
   },
-  minimize: () => ipcRenderer.send("restart-app"),
+  restart: () => ipcRenderer.send("restart-app"),
 });
 
 
