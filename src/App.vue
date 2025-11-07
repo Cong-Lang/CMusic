@@ -20,6 +20,9 @@
             </div>
         </div>
     </div>
+    <winwindow :items="[{ 'text': '确定' }, { 'text': '复制错误信息' }]" ref="windowMusicError" title="错误">
+        音乐格式错误或已损坏
+    </winwindow>
     <winwindow :items="[{ 'text': '确定' }, { 'text': '确定' }]" ref="window1" title="设置">
         <h5 style="font-weight: normal;margin: 0 0 16px 0;">高级</h5>
         <winbutton @click="openConf()">打开配置文件</winbutton>
@@ -141,6 +144,7 @@ import { ref, TransitionGroup, onMounted, onBeforeUnmount } from 'vue'
 import { Howl } from 'howler';
 
 const window1 = ref(null);
+const windowMusicError = ref(null);
 console.log('👋 This message is being logged by "App.vue", included via Vite');
 
 
@@ -271,43 +275,52 @@ async function openSound(File1 = null) {
     }
     isBigMusic.value = true;
     console.log(File)
-    if (!haveSound.value) {
-        sound = new Howl({
-            src: ['file://' + File],
-            onloaderror: (id, err) => {
-                console.error('音频加载失败：', err);
-                // 常见错误："Failed to load media" 通常是路径无效或权限问题
-            },
-            // 播放错误回调
-            onplayerror: (id, err) => {
-                console.error('播放失败：', err);
-            },
-        });
-        haveSound.value = true;
-        let musicMetadata = (await metadata.parseFile(File))["common"]
-        console.log(musicMetadata)
-        if (musicMetadata.hasOwnProperty('album')) {
-            musicName.value[0] = musicMetadata['album'];
-        } else {
-            musicName.value[0] = File.split('/')[File.split('/').length - 1];
+    try {
+        if (!haveSound.value) {
+            sound = new Howl({
+                src: ['file://' + File],
+                onloaderror: (id, err) => {
+                    console.error('音频加载失败：', err);
+                    // 常见错误："Failed to load media" 通常是路径无效或权限问题
+                },
+                // 播放错误回调
+                onplayerror: (id, err) => {
+                    console.error('播放失败：', err);
+                },
+            });
+            haveSound.value = true;
+            let musicMetadata = (await metadata.parseFile(File))["common"]
+            console.log(musicMetadata)
+            if (musicMetadata.hasOwnProperty('album')) {
+                musicName.value[0] = musicMetadata['album'];
+            } else {
+                musicName.value[0] = File.split('/')[File.split('/').length - 1];
+            }
+            if (musicMetadata.hasOwnProperty('artist')) {
+                musicName.value[1] = musicMetadata['artist'];
+            } else {
+                musicName.value[1] = '未知';
+            }
+            if (musicMetadata.hasOwnProperty('picture')) {
+                picture.value = 'data:' + musicMetadata['picture'][0]['format'] + ';base64,' + toBase64(musicMetadata['picture'][0]['data']);
+            } else {
+                picture.value = "";
+                //author.value = '未知';
+            }
+            let tempItems = { 'img': picture.value, 'title': musicName.value[0], 'author': musicName.value[1], 'file': File }
+            if (isObjectInArray(items.value, tempItems)) {
+                items.value.splice(findObjectIndex(items.value, tempItems, 'title'), 1)
+            }
+            items.value.unshift(tempItems)
+            writeFile(JSON.stringify(items.value, null, 4))
         }
-        if (musicMetadata.hasOwnProperty('artist')) {
-            musicName.value[1] = musicMetadata['artist'];
-        } else {
-            musicName.value[1] = '未知';
-        }
-        if (musicMetadata.hasOwnProperty('picture')) {
-            picture.value = 'data:' + musicMetadata['picture'][0]['format'] + ';base64,' + toBase64(musicMetadata['picture'][0]['data']);
-        } else {
-            picture.value = "";
-            //author.value = '未知';
-        }
-        let tempItems = { 'img': picture.value, 'title': musicName.value[0], 'author': musicName.value[1], 'file': File }
-        if (isObjectInArray(items.value, tempItems)) {
-            items.value.splice(findObjectIndex(items.value, tempItems, 'title'), 1)
-        }
-        items.value.unshift(tempItems)
-        writeFile(JSON.stringify(items.value, null, 4))
+    } catch (err) {
+        windowMusicError.value.showDialog();
+        sound.unload();
+        haveSound.value = false;
+        isPlay.value = false;
+        CurrentTime.value = 0;
+        isBigMusic.value = false;
     }
 
 }
