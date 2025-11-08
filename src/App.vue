@@ -754,5 +754,6 @@ p {
 
 * {
     user-select: none;
+    -webkit-user-drag: none;
 }
 </style>
