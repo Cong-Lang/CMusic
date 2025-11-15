@@ -105,7 +105,7 @@
             <img class="playing-img" v-bind:src="picture">
         </div>
         <div class="big-music" v-if="isBigMusic === true">
-            <img style="opacity:0.5;position: fixed;height: 120%;width: 120%;filter:blur(10px);top:-50px;left: -10%;object-fit: cover;"
+            <img style="opacity:0.5;position: fixed;height: 120%;width: 120%;filter:blur(30px);top:-50px;left: -10%;object-fit: cover;"
                 v-bind:src="picture">
             <div class="big-music-title">
                 <p class="playing-name-big" v-html="musicName[0]"></p>
