@@ -47,7 +47,7 @@
                             <img alt="" :src="item.img" class="card-img-gloss"></img>
                             <p style="box-sizing:border-box;padding: 12px 0 0 12px;margin: 0;">{{ item.title }}</p>
                             <p style="font-size: small;padding: 4px 0 0 12px;margin: 0;color: #646464;">{{ item.author
-                                }}
+                            }}
                             </p>
                         </wincard>
                     </div>
@@ -105,7 +105,8 @@
             <img class="playing-img" v-bind:src="picture">
         </div>
         <div class="big-music" v-if="isBigMusic === true">
-            <img style="opacity:0.5;position: fixed;height: 120%;width: 120%;filter:blur(30px);top:-50px;left: -10%;object-fit: cover;"
+            `` <img
+                style="opacity:0.5;position: fixed;height: 120%;width: 120%;filter:blur(30px);top:-50px;left: -10%;object-fit: cover;"
                 v-bind:src="picture">
             <div class="big-music-title">
                 <p class="playing-name-big" v-html="musicName[0]"></p>
