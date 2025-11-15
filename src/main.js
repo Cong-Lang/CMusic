@@ -3,6 +3,7 @@ import path from "node:path";
 import started from "electron-squirrel-startup";
 import { parseFile } from "music-metadata";
 import * as fs from "fs/promises";
+import { glob } from 'glob';
 import * as os from "os";
 const ipc = ipcMain;
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -153,7 +154,7 @@ ipcMain.handle("read-file", async (event, filePath) => {
     const data = await fs.readFile(getDocumentsFolder(filePath), "utf8");
     return { success: true, data };
   } catch (error) {
-    console.error("读取文件失败", error);
+    console.error({ success: false, error: error.message });
     return { success: false, error: error.message };
   }
 });
@@ -175,6 +176,26 @@ ipcMain.handle('open-file', (event, filePath) => {
       return { success: true, message: "文件打开成功" };
     })
     .catch(err => {
-      return { success: false, error: err.message };
+      return { success: false, error: error.message };
     });
+});
+
+ipcMain.handle('open-dir-files', async (event, filePath) => {
+  try {
+    const items = await fs.readdir(filePath);
+    const mp3Files = items.filter(item =>
+      path.extname(item).toLowerCase() === '.mp3'
+    );
+
+    return {
+      success: true,
+      files: mp3Files, // 保证是数组
+      message: `已搜索到${mp3Files.length}个mp3文件`
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message
+    };
+  }
 });

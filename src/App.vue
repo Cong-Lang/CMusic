@@ -37,11 +37,10 @@
                         <p style="height: 32px;width: 100%;margin: 0;"></p>
                         <h1 style="margin:0 ;color: #FFF;text-align: center;">最近</h1>
                     </div>
-                    <p style="text-align: center;" v-if="items.length == 0">这里还很冷清</p>
                     <div class="cards">
                         <wincard
                             style="width: 200px;background-color: transparent !important;position:relative;overflow: hidden; "
-                            v-for="(item, idx) in items" :key="idx" @click="openSound(item.file)">
+                            v-for="(item, idx) in musicItems" :key="idx" @click="openSound(item.file)">
                             <img style="width: 200px;height: 200px;margin: 0;background-size:cover;z-index: 1;position:relative;"
                                 alt="" :src="item.img" class="card-img"></img>
                             <img alt="" :src="item.img" class="card-img-gloss"></img>
@@ -141,7 +140,7 @@ import './assets/fonts/fonts.css';
 import 'web-win-vue/web-win-vue.css'
 
 import { winwindow, wintopappbar, wincard, wincombobox, wininputbox, winbutton, winrange } from 'web-win-vue'
-import { ref, TransitionGroup, onMounted, onBeforeUnmount } from 'vue'
+import { ref, TransitionGroup, onMounted, onBeforeUnmount, toRaw, shallowRef } from 'vue'
 import { Howl } from 'howler';
 
 const window1 = ref(null);
@@ -160,6 +159,8 @@ let haveSound = ref(false)
 let musicName = ref(['', '', ''])
 let picture = ref('')
 let isFull = ref(false)
+let version = ref('1.1.0')
+let musicItems = shallowRef()
 
 function openConf() {
     window.electronAPI.openFile('.cmusic')
@@ -309,10 +310,13 @@ async function openSound(File1 = null) {
                 //author.value = '未知';
             }
             let tempItems = { 'img': picture.value, 'title': musicName.value[0], 'author': musicName.value[1], 'file': File }
-            if (isObjectInArray(items.value, tempItems)) {
-                items.value.splice(findObjectIndex(items.value, tempItems, 'title'), 1)
+            console.error(await items.value)
+            if (isObjectInArray(items.value[0], tempItems)) {
+                items.value[0].splice(findObjectIndex(items.value[0], tempItems, 'title'), 1)
             }
-            items.value.unshift(tempItems)
+            items.value[0].unshift(tempItems)
+            items.value[1]['version'] = version.value
+            console.log(items.value)
             writeFile(JSON.stringify(items.value, null, 4))
         }
     } catch (err) {
@@ -385,12 +389,12 @@ const handleKeydown = (e) => {
     }
 };
 
-async function writeFile(fileText) {
-    return await electronAPI.writeFile('.cmusic', fileText)
+async function readDirFiles(path) {
+    console.error(await window.electronAPI.readDirFiles(path))
 }
 
-async function readFile() {
-    return await electronAPI.readFile('.cmusic')
+async function writeFile(fileText) {
+    return await electronAPI.writeFile('.cmusic', fileText)
 }
 
 onMounted(() => {
@@ -402,10 +406,17 @@ onBeforeUnmount(() => {
 });
 
 async function start() {
-    items.value = JSON.parse((await readFile())['data'])
+    try {
+        items.value = JSON.parse((await electronAPI.readFile('.cmusic'))['data'])
+    } catch {
+        items.value = [[], {}]
+    }
+    musicItems.value = toRaw(items.value[0])
+    console.log(musicItems.value)
 }
 
 start()
+readDirFiles('/home/hhcl233/音乐/MC/')
 </script>
 
 <style lang="css" scoped>

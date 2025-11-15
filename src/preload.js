@@ -38,6 +38,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   openFile: (filePath) => {
     return ipcRenderer.invoke('open-file', filePath);
   },
+  readDirFiles: (filePath) => {
+    return ipcRenderer.invoke('open-dir-files', filePath);
+  },
 });
 
 contextBridge.exposeInMainWorld('metadata', {
