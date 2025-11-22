@@ -9,11 +9,13 @@
             <div class="titlebar-button" id="titlebar-minimize" @click="handleMinimize">
                 <i class="ms-icon icon-minimize titlebar-icon"></i>
             </div>
-            <div class="titlebar-button" id="titlebar-maximize" @click='handleMaximize' v-if="isFull === false">
-                <i class="ms-icon icon-maximize titlebar-icon" v-if="isMaximized === false"></i>
-                <i class="ms-icon icon-restore titlebar-icon" v-if="isMaximized === true"></i>
+            <div class="titlebar-button" id="titlebar-maximize" @click='handleMaximize'
+                v-if="globalState.isFull.value === false">
+                <i class="ms-icon icon-maximize titlebar-icon" v-if="globalState.isMaximized.value === false"></i>
+                <i class="ms-icon icon-restore titlebar-icon" v-if="globalState.isMaximized.value === true"></i>
             </div>
-            <div class="titlebar-button" id="titlebar-maximize" @click='FullScreen()' v-if="isFull === true">
+            <div class="titlebar-button" id="titlebar-maximize" @click='fullScreen()'
+                v-if="globalState.isFull.value === true">
                 <i class="ms-icon icon-back-to-window titlebar-icon"></i>
             </div>
             <div class="titlebar-button" id="titlebar-close" @click="handleClose">
@@ -48,7 +50,7 @@
                             <img alt="" :src="item.img" class="card-img-gloss"></img>
                             <p style="box-sizing:border-box;padding: 12px 0 0 12px;margin: 0;">{{ item.title }}</p>
                             <p style="font-size: small;padding: 4px 0 0 12px;margin: 0;color: #646464;">{{ item.author
-                                }}
+                            }}
                             </p>
                         </wincard>
                     </div>
@@ -128,9 +130,11 @@
                 </div>
                 <div class="big-music-control-right">
                     <winbutton style="height: 100%;background-color: transparent;width: 50px;padding: 0;"
-                        @click="FullScreen()">
-                        <i class="ms-icon icon-full-screen playing-start-big" v-if="isFull === false"></i>
-                        <i class="ms-icon icon-back-to-window playing-start-big" v-if="isFull === true"></i>
+                        @click="fullScreen()">
+                        <i class="ms-icon icon-full-screen playing-start-big"
+                            v-if="globalState.isFull.value === false"></i>
+                        <i class="ms-icon icon-back-to-window playing-start-big"
+                            v-if="globalState.isFull.value === true"></i>
                     </winbutton>
                 </div>
             </div>
@@ -153,9 +157,9 @@ const window1 = ref(null);
 const windowMusicError = ref(null);
 console.log('👋 This message is being logged by "App.vue", included via Vite');
 
-function FullScreen() {
-    globalState.windowControls.fullscreen()
-    globalState.isFull.value = !isFull.value
+function fullScreen() {
+    window.windowControls.fullscreen()
+    globalState.isFull.value = !globalState.isFull.value
 }
 
 function nextPage(date) {
