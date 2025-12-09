@@ -1,7 +1,7 @@
 import { Howl } from 'howler';
 import { objectUtils } from '../utils/object.js';
 import { globalState } from '../core/globalState.js';
-import { base64 } from '../utils/base64.js'
+import { base64Utils } from '../utils/base64.js'
 
 export class musicManager {
     static async open(File1 = null) {
@@ -42,7 +42,7 @@ export class musicManager {
             console.log(musicMetadata)
             globalState.musicName.value[0] = musicMetadata['title'] ?? File.split('/')[File.split('/').length - 1];
             globalState.musicName.value[1] = musicMetadata['artist'] ?? '未知';
-            globalState.picture.value = 'data:' + musicMetadata['picture'][0]['format'] + ';base64,' + base64.toBase64(musicMetadata['picture'][0]['data']) ?? "";
+            globalState.picture.value = 'data:' + musicMetadata['picture'][0]['format'] + ';base64,' + base64Utils.toBase64(musicMetadata['picture'][0]['data']) ?? "";
             let tempItems = { 'img': globalState.picture.value, 'title': globalState.musicName.value[0], 'author': globalState.musicName.value[1], 'file': File }
             console.error(await globalState.items.value)
             if (objectUtils.isObjectInArray(globalState.items.value[0], tempItems)) {
@@ -59,6 +59,20 @@ export class musicManager {
             globalState.isPlay.value = false;
             globalState.CurrentTime.value = 0;
             globalState.isBigMusic.value = false;
+        }
+    }
+
+    static play() {
+        if (!globalState.sound.playing()) {
+            document.title = '播放本地音乐中🎵';
+            globalState.sound.play();
+            console.log(globalState.isPlay.value)
+            globalState.isPlay.value = true
+        } else {
+            document.title = '未播放音乐';
+            globalState.sound.pause();
+            console.log(globalState.isPlay.value)
+            globalState.isPlay.value = false
         }
     }
 
@@ -88,6 +102,10 @@ export class fileControl {
         return await window.electronAPI.writeFile('.cmusic', fileText)
     }
 
+    static openConfi() {
+        window.electronAPI.openFile('.cmusic')
+    }
+
     static async openFile() {
         const result = await window.electronAPI.showOpenDialog({
             title: '选择文件',
@@ -102,5 +120,9 @@ export class fileControl {
         } else {
             return [null]
         }
+    }
+
+    async readDirFiles(path) {
+        return (await window.electronAPI.readDirFiles(path))
     }
 };

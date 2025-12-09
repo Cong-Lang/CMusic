@@ -1,4 +1,4 @@
-export class base64 {
+export class base64Utils {
     static toBase64(buffer) {
         var binary = '';
         var bytes = new Uint8Array(buffer);

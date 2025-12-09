@@ -28,9 +28,9 @@
     </winwindow>
     <winwindow :items="[{ 'text': '确定' }, { 'text': '确定' }]" ref="window1Ref" title="设置">
         <h5 style="font-weight: normal;margin: 0 0 16px 0;">高级</h5>
-        <winbutton @click="electronAPI.openConf()">打开配置文件</winbutton>
+        <winbutton @click="fileControl.openConfi()">打开配置文件</winbutton>
     </winwindow>
-    <TransitionGroup>
+    <TransitionGroup name="container">
         <wintopappbar style="top:36px" :items="[{ 'name': '最近' }, { 'name': '我的库' }]" :rightMenu="[{ 'name': '设置' }]"
             @update="nextPage" v-if="globalState.isBigMusic.value === false" />
         <Transition v-if="globalState.isBigMusic.value === false">
@@ -50,7 +50,7 @@
                             <img alt="" :src="item.img" class="card-img-gloss"></img>
                             <p style="box-sizing:border-box;padding: 12px 0 0 12px;margin: 0;">{{ item.title }}</p>
                             <p style="font-size: small;padding: 4px 0 0 12px;margin: 0;color: #646464;">{{ item.author
-                            }}
+                                }}
                             </p>
                         </wincard>
                     </div>
@@ -94,7 +94,7 @@
                 </div>
             </div>
             <div style="margin-left: auto;height: 100%;">
-                <winbutton style="height: 100%;background-color: transparent;width: 75px;" @click="playSound()">
+                <winbutton style="height: 100%;background-color: transparent;width: 75px;" @click="musicManager.play()">
                     <i class="ms-icon icon-play playing-start" v-if="globalState.isPlay.value === false"></i>
                     <i class="ms-icon icon-pause playing-start" v-if="globalState.isPlay.value === true"></i>
                 </winbutton>
@@ -108,8 +108,7 @@
             <img class="playing-img" v-bind:src="globalState.picture.value">
         </div>
         <div class="big-music" v-if="globalState.isBigMusic.value === true">
-            `` <img
-                style="opacity:0.5;position: fixed;height: 120%;width: 120%;filter:blur(30px);top:-50px;left: -10%;object-fit: cover;"
+            <img style="opacity:0.5;position: fixed;height: 120%;width: 120%;filter:blur(30px);top:-50px;left: -10%;object-fit: cover;"
                 v-bind:src="globalState.picture.value">
             <div class="big-music-title">
                 <p class="playing-name-big" v-html="globalState.musicName.value[0]"></p>
@@ -123,7 +122,7 @@
             <div class="big-music-control">
                 <div class="big-music-control-left">
                     <winbutton style="height: 100%;background-color: transparent;width: 50px;padding: 0;"
-                        @click="playSound();">
+                        @click="musicManager.play();">
                         <i class="ms-icon icon-play playing-start-big" v-if="globalState.isPlay.value === false"></i>
                         <i class="ms-icon icon-pause playing-start-big" v-if="globalState.isPlay.value === true"></i>
                     </winbutton>
@@ -150,7 +149,7 @@ import { winwindow, wintopappbar, wincard, wincombobox, wininputbox, winbutton, 
 import { ref, TransitionGroup, onMounted, onBeforeUnmount, toRaw, watch } from 'vue'
 
 import { globalState } from './core/globalState.js'
-import { musicManager } from './models/fileManager.js'
+import { musicManager, fileControl } from './models/fileManager.js'
 import { electronAPI } from './models/electron.js'
 
 console.log('👋 This message is being logged by "App.vue", included via Vite');
@@ -224,24 +223,10 @@ function updateSound(time) {
     globalState.sound.seek(time / 100 * globalState.sound.duration())
 }
 
-function playSound() {
-    if (!globalState.sound.playing()) {
-        document.title = '播放本地音乐中🎵';
-        globalState.sound.play();
-        console.log(globalState.isPlay.value)
-        globalState.isPlay.value = true
-    } else {
-        document.title = '未播放音乐';
-        globalState.sound.pause();
-        console.log(globalState.isPlay.value)
-        globalState.isPlay.value = false
-    }
-}
-
 const handleKeydown = (e) => {
     if (e.keyCode === 32 || e.key === ' ') {
         if (globalState.haveSound) {
-            playSound()
+            musicManager.play()
         }
     } else if (e.keyCode === 39 || e.key === 'ArrowRight') {
         if ((globalState.sound.seek() + 2.5) <= globalState.sound.duration()) {
@@ -262,14 +247,6 @@ const handleKeydown = (e) => {
     }
 };
 
-async function readDirFiles(path) {
-    console.error(await window.electronAPI.readDirFiles(path))
-}
-
-async function writeFile(fileText) {
-    return await window.electronAPI.writeFile('.cmusic', fileText)
-}
-
 onMounted(() => {
     document.addEventListener('keydown', handleKeydown);
 });
@@ -278,7 +255,7 @@ onBeforeUnmount(() => {
     document.removeEventListener('keydown', handleKeydown);
 });
 
-async function start() {
+async function init() {
     try {
         globalState.items.value = JSON.parse((await window.electronAPI.readFile('.cmusic'))['data'])
     } catch {
@@ -288,8 +265,8 @@ async function start() {
     console.log(globalState.musicItems.value)
 }
 
-start()
-readDirFiles('/home/hhcl233/音乐/MC/')
+init()
+//readDirFiles('/home/hhcl233/音乐/MC/')
 </script>
 
 <style lang="css" scoped>
@@ -356,6 +333,7 @@ readDirFiles('/home/hhcl233/音乐/MC/')
 }
 
 .big-music {
+    opacity: 1;
     height: 100%;
     width: 100%;
     background-color: #000000;
@@ -640,5 +618,16 @@ p {
 * {
     user-select: none;
     -webkit-user-drag: none;
+}
+
+.container-enter-active,
+.container-leave-active {
+    transition: all 0.5s ease;
+    opacity: 1;
+}
+
+.container-enter-from,
+.container-leave-to {
+    opacity: 0;
 }
 </style>
