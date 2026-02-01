@@ -45,8 +45,7 @@
                             style="width: 200px;background-color: transparent !important;position:relative;overflow: hidden; "
                             v-for="(item, idx) in globalState.musicItems.value" :key="idx"
                             @click="musicManager.open(item.file)">
-                            <img style="width: 200px;height: 200px;margin: 0;background-size:cover;z-index: 1;position:relative;"
-                                alt="" :src="item.img" class="card-img"></img>
+                            <img alt="" :src="item.img" class="card-img"></img>
                             <img alt="" :src="item.img" class="card-img-gloss"></img>
                             <p style="box-sizing:border-box;padding: 12px 0 0 12px;margin: 0;">{{ item.title }}</p>
                             <p style="font-size: small;padding: 4px 0 0 12px;margin: 0;color: #646464;">{{ item.author
@@ -99,7 +98,7 @@
                     <i class="ms-icon icon-pause playing-start" v-if="globalState.isPlay.value === true"></i>
                 </winbutton>
                 <winbutton style="height: 100%;background-color: transparent;width: 75px;" @click="musicManager.open()">
-                    <i class="ms-icon icon-upload playing-start"></i>
+                    <i class="ms-icon icon-open playing-start"></i>
                 </winbutton>
             </div>
             <div
@@ -108,8 +107,7 @@
             <img class="playing-img" v-bind:src="globalState.picture.value">
         </div>
         <div class="big-music" v-if="globalState.isBigMusic.value === true">
-            <img style="opacity:0.5;position: fixed;height: 120%;width: 120%;filter:blur(30px);top:-50px;left: -10%;object-fit: cover;"
-                v-bind:src="globalState.picture.value">
+            <img class="big-music-background" v-bind:src="globalState.picture.value">
             <div class="big-music-title">
                 <img v-bind:src="globalState.picture.value" class="big-music-img">
                 <div class="big-music-info">
@@ -295,6 +293,17 @@ init()
     margin: 0;
 }
 
+.big-music-background {
+    opacity: 0.5;
+    position: fixed;
+    height: 120%;
+    width: 120%;
+    filter: blur(30px);
+    top: -15px;
+    left: -10%;
+    object-fit: cover;
+}
+
 .big-music-title {
     position: fixed;
     bottom: 150px;
@@ -319,7 +328,7 @@ init()
 
 .playing-author-big {
     font-size: 16px;
-    margin: 8px 0 0 0;
+    margin: 0 0 0 2px;
     color: #ffffffb5;
 }
 
@@ -381,6 +390,10 @@ init()
 
 .icon-upload::before {
     content: "\E898";
+}
+
+.icon-open::before {
+    content: "\E8E5";
 }
 
 .icon-play::before {
@@ -518,6 +531,15 @@ init()
 
 .card-img:hover~.card-img-gloss {
     opacity: 0.75 !important;
+}
+
+.card-img {
+    width: 200px;
+    height: 200px;
+    margin: 0;
+    background-size: cover;
+    z-index: 1;
+    position: relative;
 }
 
 .container-2 {
@@ -658,5 +680,13 @@ p {
 .container-enter-from,
 .container-leave-to {
     opacity: 0;
+}
+
+.playing-info img[src=""] {
+    visibility: hidden;
+}
+
+.playing-info:has(img[src=""]) {
+    visibility: hidden;
 }
 </style>
