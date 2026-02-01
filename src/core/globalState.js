@@ -15,5 +15,6 @@ export let globalState = {
     version: ref('1.1.0'),
     musicItems: shallowRef(),
     windowMusicError: null,
-    window1: null
+    window1: null,
+    repeatPlay: ref(false)
 }

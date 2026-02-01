@@ -29,6 +29,8 @@
     <wincontentdialog :items="[{ 'text': '确定' }, { 'text': '确定' }]" ref="window1Ref" title="设置">
         <h5 style="font-weight: normal;margin: 0 0 16px 0;">高级</h5>
         <winbutton @click="fileControl.openConfi()">打开配置文件</winbutton>
+        <h5 style="font-weight: normal;margin: 0 0 16px 0;">调试</h5>
+        <winbutton @click="fileControl.readOpenDirectoryFiles()">获取文件夹内音乐</winbutton>
     </wincontentdialog>
     <TransitionGroup name="container">
         <wintopappbar style="top:36px" :items="[{ 'name': '最近' }, { 'name': '我的库' }]" :rightMenu="[{ 'name': '设置' }]"
@@ -49,7 +51,7 @@
                             <img alt="" :src="item.img" class="card-img-gloss"></img>
                             <p style="box-sizing:border-box;padding: 12px 0 0 12px;margin: 0;">{{ item.title }}</p>
                             <p style="font-size: small;padding: 4px 0 0 12px;margin: 0;color: #646464;">{{ item.author
-                                }}
+                            }}
                             </p>
                         </wincard>
                     </div>
@@ -126,6 +128,13 @@
                         @click="musicManager.play();">
                         <i class="ms-icon icon-play playing-start-big" v-if="globalState.isPlay.value === false"></i>
                         <i class="ms-icon icon-pause playing-start-big" v-if="globalState.isPlay.value === true"></i>
+                    </winbutton>
+                    <winbutton style="height: 100%;background-color: transparent;width: 50px;padding: 0;"
+                        @click="musicManager.repeatPlay();">
+                        <i class="ms-icon icon-repeat playing-start-big"
+                            v-if="globalState.repeatPlay.value === false"></i>
+                        <i class="ms-icon icon-repeat-off playing-start-big"
+                            v-if="globalState.repeatPlay.value === true"></i>
                     </winbutton>
                 </div>
                 <div class="big-music-control-right">
@@ -316,12 +325,13 @@ init()
 
 .big-music-info {
     width: calc(100% - 100px);
+    margin-left: 12px;
 }
 
 .big-music-img {
     background-color: rgb(235, 235, 235);
-    height: 100px;
-    width: 100px;
+    height: 125px;
+    width: 125px;
     background-size: cover;
     border: none;
 }
@@ -418,6 +428,18 @@ init()
 
 .icon-restore::before {
     content: "\E923";
+}
+
+.icon-repeat::before {
+    content: "\E8EE";
+}
+
+.icon-repeat-one::before {
+    content: "\E8ED";
+}
+
+.icon-repeat-off::before {
+    content: "\F0D1";
 }
 
 .ms-icon {

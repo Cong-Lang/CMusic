@@ -95,6 +95,11 @@ export class musicManager {
         globalState.isPlay.value = false;
         globalState.CurrentTime.value = 0;
     }
+
+    static repeatPlay() {
+        globalState.sound.loop(!globalState.repeatPlay.value)
+        globalState.repeatPlay.value = !globalState.repeatPlay.value;
+    }
 };
 
 export class fileControl {
@@ -122,7 +127,27 @@ export class fileControl {
         }
     }
 
-    async readDirFiles(path) {
+    static async openDirectory() {
+        const result = await window.electronAPI.showOpenDialog({
+            title: '选择文件夹',
+            properties: ['openDirectory'], // 允许选择文件
+        });
+        if (result.filePaths.length > 0) {
+            console.log('选择的文件夹:', result.filePaths);
+            return result.filePaths
+        } else {
+            return [null]
+        }
+    }
+
+    static async readDirFiles(path) {
         return (await window.electronAPI.readDirFiles(path))
+    }
+
+    static async readOpenDirectoryFiles() {
+        const directory = await fileControl.openDirectory()
+        const items = await window.electronAPI.readDirFiles(directory[0])
+        console.log(items)
+        return (items)
     }
 };
