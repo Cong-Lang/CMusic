@@ -50,7 +50,7 @@
                             <img alt="" :src="item.img" class="card-img-gloss"></img>
                             <p style="box-sizing:border-box;padding: 12px 0 0 12px;margin: 0;">{{ item.title }}</p>
                             <p style="font-size: small;padding: 4px 0 0 12px;margin: 0;color: #646464;">{{ item.author
-                            }}
+                                }}
                             </p>
                         </wincard>
                     </div>
@@ -111,8 +111,11 @@
             <img style="opacity:0.5;position: fixed;height: 120%;width: 120%;filter:blur(30px);top:-50px;left: -10%;object-fit: cover;"
                 v-bind:src="globalState.picture.value">
             <div class="big-music-title">
-                <p class="playing-name-big" v-html="globalState.musicName.value[0]"></p>
-                <p class="playing-author-big" v-html="globalState.musicName.value[1]"></p>
+                <img v-bind:src="globalState.picture.value" class="big-music-img">
+                <div class="big-music-info">
+                    <p class="playing-name-big" v-html="globalState.musicName.value[0]"></p>
+                    <p class="playing-author-big" v-html="globalState.musicName.value[1]"></p>
+                </div>
             </div>
             <div class="big-music-range">
                 <winrange type="range" style="width: 100%;" color="#FFF" :max="100" :min="0"
@@ -297,6 +300,21 @@ init()
     bottom: 150px;
     width: calc(100% - 50px);
     padding: 32px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.big-music-info {
+    width: calc(100% - 100px);
+}
+
+.big-music-img {
+    background-color: rgb(235, 235, 235);
+    height: 100px;
+    width: 100px;
+    background-size: cover;
+    border: none;
 }
 
 .playing-author-big {
@@ -601,6 +619,12 @@ init()
     }
 
     .titlebar {
+        color: #ffffff;
+    }
+
+    .playing-name,
+    .playing-author,
+    .ms-icon {
         color: #ffffff;
     }
 }
