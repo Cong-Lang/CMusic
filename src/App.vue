@@ -23,13 +23,13 @@
             </div>
         </div>
     </div>
-    <winwindow :items="[{ 'text': '确定' }, { 'text': '复制错误信息' }]" ref="globalState.windowMusicError" title="错误">
+    <wincontentdialog :items="[{ 'text': '确定' }, { 'text': '复制错误信息' }]" ref="musicErrorDialog" title="错误">
         音乐格式错误或已损坏
-    </winwindow>
-    <winwindow :items="[{ 'text': '确定' }, { 'text': '确定' }]" ref="window1Ref" title="设置">
+    </wincontentdialog>
+    <wincontentdialog :items="[{ 'text': '确定' }, { 'text': '确定' }]" ref="window1Ref" title="设置">
         <h5 style="font-weight: normal;margin: 0 0 16px 0;">高级</h5>
         <winbutton @click="fileControl.openConfi()">打开配置文件</winbutton>
-    </winwindow>
+    </wincontentdialog>
     <TransitionGroup name="container">
         <wintopappbar style="top:36px" :items="[{ 'name': '最近' }, { 'name': '我的库' }]" :rightMenu="[{ 'name': '设置' }]"
             @update="nextPage" v-if="globalState.isBigMusic.value === false" />
@@ -50,7 +50,7 @@
                             <img alt="" :src="item.img" class="card-img-gloss"></img>
                             <p style="box-sizing:border-box;padding: 12px 0 0 12px;margin: 0;">{{ item.title }}</p>
                             <p style="font-size: small;padding: 4px 0 0 12px;margin: 0;color: #646464;">{{ item.author
-                                }}
+                            }}
                             </p>
                         </wincard>
                     </div>
@@ -143,9 +143,9 @@
 
 <script setup>
 import './assets/fonts/fonts.css';
-import 'web-win-vue/web-win-vue.css'
+import 'web-win-vue/style.css'
 
-import { winwindow, wintopappbar, wincard, wincombobox, wininputbox, winbutton, winrange } from 'web-win-vue'
+import { wincontentdialog, wintopappbar, wincard, wincombobox, wininputbox, winbutton, winrange } from 'web-win-vue'
 import { ref, TransitionGroup, onMounted, onBeforeUnmount, toRaw, watch } from 'vue'
 
 import { globalState } from './core/globalState.js'
@@ -155,10 +155,15 @@ import { electronAPI } from './models/electron.js'
 console.log('👋 This message is being logged by "App.vue", included via Vite');
 
 const window1Ref = ref(null);
+const musicErrorDialog = ref(null);
 
-watch(window1Ref, (newValue) => {
-    globalState.window1.value = newValue;
-    console.log('窗口引用已更新:', !!newValue);
+onMounted(() => {
+    if (window1Ref.value) {
+        globalState.window1 = window1Ref.value;
+    }
+    if (musicErrorDialog.value) {
+        globalState.windowMusicError = musicErrorDialog.value;
+    }
 });
 
 function fullScreen() {
@@ -169,7 +174,7 @@ function fullScreen() {
 function nextPage(date) {
     globalState.searchError.value = '';
     if (date[1] === 'right' && date[0] === 0) {
-        globalState.window1.value.showDialog();
+        globalState.window1.showDialog();
     } else if (date[1] === 'left' && date[0] === 1) {
         globalState.page.value = 2
     } else {
@@ -191,7 +196,7 @@ const handleback = () => {
 
 const handleMaximize = () => {
     window.windowControls.toggleMaximize()
-    isMaximized.value = !isMaximized.value
+    globalState.isMaximized.value = !globalState.isMaximized.value
 }
 
 

@@ -14,7 +14,6 @@ export let globalState = {
     isFull: ref(false),
     version: ref('1.1.0'),
     musicItems: shallowRef(),
-    sound: null,
-    window1: ref(null),
-    windowMusicError: ref(null)
+    windowMusicError: null,
+    window1: null
 }

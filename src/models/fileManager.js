@@ -53,7 +53,7 @@ export class musicManager {
             fileControl.writeConfi(JSON.stringify(globalState.items.value, null, 4))
         } catch (err) {
             console.error(err)
-            globalState.windowMusicError.value.showDialog();
+            globalState.windowMusicError.showDialog();
             globalState.sound.unload();
             globalState.haveSound.value = false;
             globalState.isPlay.value = false;
