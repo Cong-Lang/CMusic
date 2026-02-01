@@ -51,7 +51,7 @@
                             <img alt="" :src="item.img" class="card-img-gloss"></img>
                             <p style="box-sizing:border-box;padding: 12px 0 0 12px;margin: 0;">{{ item.title }}</p>
                             <p style="font-size: small;padding: 4px 0 0 12px;margin: 0;color: #646464;">{{ item.author
-                            }}
+                                }}
                             </p>
                         </wincard>
                     </div>
@@ -158,7 +158,7 @@ import 'web-win-vue/style.css'
 import { wincontentdialog, wintopappbar, wincard, wincombobox, wininputbox, winbutton, winrange } from 'web-win-vue'
 import { ref, TransitionGroup, onMounted, onBeforeUnmount, toRaw, watch } from 'vue'
 
-import { globalState } from './core/globalState.js'
+import { globalState, iconFontsUnicode, iconFontsFamily } from './core/globalState.js'
 import { musicManager, fileControl } from './models/fileManager.js'
 import { electronAPI } from './models/electron.js'
 
@@ -443,7 +443,7 @@ init()
 }
 
 .ms-icon {
-    font-family: 'SegMDL2' !important;
+    font-family: v-bind(iconFontsFamily) !important;
     font-style: normal;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
