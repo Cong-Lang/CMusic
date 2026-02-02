@@ -89,7 +89,7 @@
                             <img alt="" :src="item.img" class="card-img-gloss"></img>
                             <p style="box-sizing:border-box;padding: 12px 0 0 12px;margin: 0;">{{ item.title }}</p>
                             <p style="font-size: small;padding: 4px 0 0 12px;margin: 0;color: #646464;">{{ item.author
-                            }}
+                                }}
                             </p>
                         </wincard>
                     </div>
@@ -133,7 +133,8 @@
                 </div>
             </div>
             <div style="margin-left: auto;height: 100%;">
-                <winbutton style="height: 100%;background-color: transparent;width: 75px;" @click="musicManager.play()">
+                <winbutton style="height: 100%;background-color: transparent;width: 75px;" @click="musicManager.play()"
+                    @focus="playFocus = true" @blur="playFocus = false">
                     <i class="ms-icon icon-play playing-start" v-if="globalState.isPlay.value === false"></i>
                     <i class="ms-icon icon-pause playing-start" v-if="globalState.isPlay.value === true"></i>
                 </winbutton>
@@ -163,7 +164,7 @@
             <div class="big-music-control">
                 <div class="big-music-control-left">
                     <winbutton style="height: 100%;background-color: transparent;width: 50px;padding: 0;"
-                        @click="musicManager.play();">
+                        @click="musicManager.play();" @focus="playFocus = true" @blur="playFocus = false">
                         <i class="ms-icon icon-play playing-start-big" v-if="globalState.isPlay.value === false"></i>
                         <i class="ms-icon icon-pause playing-start-big" v-if="globalState.isPlay.value === true"></i>
                     </winbutton>
@@ -216,6 +217,7 @@ console.log('👋 This message is being logged by "App.vue", included via Vite')
 
 const window1Ref = ref(null);
 const musicErrorDialog = ref(null);
+let playFocus = ref(false)
 
 onMounted(() => {
     if (window1Ref.value) {
@@ -276,9 +278,7 @@ function tabPlayIcon() {
                 globalState.isPlay.value = false;
             }
         });
-        if (globalState.sound.playing()) {
-            globalState.CurrentTime.value = (globalState.sound.seek() / globalState.sound.duration()) * 100
-        }
+        globalState.CurrentTime.value = (globalState.sound.seek() / globalState.sound.duration()) * 100
     }
 }
 
@@ -292,7 +292,7 @@ function updateSound(time) {
 
 const handleKeydown = (e) => {
     if (e.keyCode === 32 || e.key === ' ') {
-        if (globalState.haveSound) {
+        if (globalState.haveSound && !playFocus) {
             musicManager.play()
         }
     } else if (e.keyCode === 39 || e.key === 'ArrowRight') {
