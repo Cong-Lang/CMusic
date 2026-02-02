@@ -27,10 +27,44 @@
         音乐格式错误或已损坏
     </wincontentdialog>
     <wincontentdialog :items="[{ 'text': '确定' }, { 'text': '确定' }]" ref="window1Ref" title="设置">
-        <h5 style="font-weight: normal;margin: 0 0 16px 0;">高级</h5>
-        <winbutton @click="fileControl.openConfi()">打开配置文件</winbutton>
-        <h5 style="font-weight: normal;margin: 0 0 16px 0;">调试</h5>
-        <winbutton @click="fileControl.readOpenDirectoryFiles()">获取文件夹内音乐</winbutton>
+        <div class="settings">
+            <div class="icon-fonts">
+                <h5 class="settings-zone-title">字体设置</h5>
+                <h6 class="settings-zone-info">您可以在这里配置图标类字体在软件内的Unicode</h6>
+                <winbutton @click="iconFontsManager.writeIconFontsUnicode()">保存配置</winbutton>
+                <table border="0" class="settings-table">
+                    <tbody>
+                        <tr>
+                            <td>字体名称</td>
+                            <td>
+                                <wininputbox placeholder="字体名称" :value="iconFontsFamily" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Unicode设置</td>
+                            <td></td>
+                        </tr>
+                        <tr v-for="(value, key, index) in iconFontsUnicode" :key="index">
+                            <td>
+                                {{ key }}
+                            </td>
+                            <td>
+                                <wininputbox placeholder="字体名称" :value="value"
+                                    @change="iconFontsManager.changeIconFontsUnicode(Object.keys(iconFontsUnicode)[index], $event.target.value)" />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="advanced">
+                <h5 class="settings-zone-title">高级</h5>
+                <winbutton @click="fileControl.openConfi()">打开配置文件</winbutton>
+            </div>
+            <div class="debug">
+                <h5 class="settings-zone-title">调试 / 测试</h5>
+                <winbutton @click="fileControl.readOpenDirectoryFiles()">获取文件夹内音乐</winbutton>
+            </div>
+        </div>
     </wincontentdialog>
     <TransitionGroup name="container">
         <wintopappbar style="top:36px" :items="[{ 'name': '最近' }, { 'name': '我的库' }]" :rightMenu="[{ 'name': '设置' }]"
@@ -51,7 +85,7 @@
                             <img alt="" :src="item.img" class="card-img-gloss"></img>
                             <p style="box-sizing:border-box;padding: 12px 0 0 12px;margin: 0;">{{ item.title }}</p>
                             <p style="font-size: small;padding: 4px 0 0 12px;margin: 0;color: #646464;">{{ item.author
-                                }}
+                            }}
                             </p>
                         </wincard>
                     </div>
@@ -156,11 +190,23 @@ import './assets/fonts/fonts.css';
 import 'web-win-vue/style.css'
 
 import { wincontentdialog, wintopappbar, wincard, wincombobox, wininputbox, winbutton, winrange } from 'web-win-vue'
-import { ref, TransitionGroup, onMounted, onBeforeUnmount, toRaw, watch } from 'vue'
+import { ref, TransitionGroup, onMounted, onBeforeUnmount, toRaw, watch, computed } from 'vue'
 
 import { globalState, iconFontsUnicode, iconFontsFamily } from './core/globalState.js'
+
+const iconStyleMap = computed(() => {
+    const map = {};
+    for (const key in iconFontsUnicode.value) {
+        const hexStr = iconFontsUnicode.value[key];
+        const codePoint = parseInt(hexStr, 16);
+        const unicodeChar = String.fromCodePoint(codePoint);
+        map[key.replace(/-/g, '_')] = `"${unicodeChar}"`;
+    }
+    return map;
+});
 import { musicManager, fileControl } from './models/fileManager.js'
 import { electronAPI } from './models/electron.js'
+import { iconFontsManager } from './models/iconFontsManager.js';
 
 console.log('👋 This message is being logged by "App.vue", included via Vite');
 
@@ -271,6 +317,7 @@ onBeforeUnmount(() => {
 });
 
 async function init() {
+    iconFontsManager.readIconFontsUnicode()
     try {
         globalState.items.value = JSON.parse((await window.electronAPI.readFile('.cmusic'))['data'])
     } catch {
@@ -285,6 +332,27 @@ init()
 </script>
 
 <style lang="css" scoped>
+.settings {
+    max-height: 600px;
+    min-height: 300px;
+    overflow: auto;
+}
+
+.settings-zone-title {
+    font-weight: normal;
+    margin: 8px 0 8px 0;
+}
+
+.settings-zone-info {
+    font-weight: normal;
+    margin: 4px 0 4px 0;
+}
+
+.settings-table {
+    width: 100%;
+    font-weight: normal;
+}
+
 .big-music-control-left {
     display: flex;
     flex: 2;
@@ -382,64 +450,64 @@ init()
     backdrop-filter: blur(10px);
     height: 100%;
     position: fixed;
-    top: 0
+    top: 0;
 }
 
 .icon-back-to-window::before {
-    content: "\E73F";
+    content: v-bind("iconStyleMap.icon_back_to_window");
 }
 
 
 .icon-full-screen::before {
-    content: "\E740";
+    content: v-bind("iconStyleMap.icon_full_screen");
 }
 
 .icon-pause::before {
-    content: "\EDB4";
+    content: v-bind("iconStyleMap.icon_pause");
 }
 
 .icon-upload::before {
-    content: "\E898";
+    content: v-bind("iconStyleMap.icon_upload");
 }
 
 .icon-open::before {
-    content: "\E8E5";
+    content: v-bind("iconStyleMap.icon_open");
 }
 
 .icon-play::before {
-    content: "\EDB5";
+    content: v-bind("iconStyleMap.icon_play");
 }
 
 .icon-minimize::before {
-    content: "\E921";
+    content: v-bind("iconStyleMap.icon_minimize");
 }
 
 .icon-back::before {
-    content: "\E830";
+    content: v-bind("iconStyleMap.icon_back");
 }
 
 .icon-maximize::before {
-    content: "\E922";
+    content: v-bind("iconStyleMap.icon_maximize");
 }
 
 .icon-close::before {
-    content: "\E8BB";
+    content: v-bind("iconStyleMap.icon_close");
 }
 
 .icon-restore::before {
-    content: "\E923";
+    content: v-bind("iconStyleMap.icon_restore");
 }
 
 .icon-repeat::before {
-    content: "\E8EE";
+    content: v-bind("iconStyleMap.icon_repeat");
 }
 
 .icon-repeat-one::before {
-    content: "\E8ED";
+    content: v-bind("iconStyleMap.icon_repeat_one");
 }
 
 .icon-repeat-off::before {
-    content: "\F0D1";
+    content: v-bind("iconStyleMap.icon_repeat_off");
 }
 
 .ms-icon {
@@ -680,7 +748,8 @@ h4,
 h5,
 h6,
 h5,
-p {
+p,
+tr {
     font-family: 'SourceHanSansSC';
 }
 
@@ -710,5 +779,18 @@ p {
 
 .playing-info:has(img[src=""]) {
     visibility: hidden;
+}
+
+*::-webkit-scrollbar {
+    width: 14px;
+    height: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: #8b8b8b;
+}
+
+*::-webkit-scrollbar-track {
+    background-color: #e8e8e8;
 }
 </style>

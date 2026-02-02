@@ -1,19 +1,20 @@
 import { ref, shallowRef } from 'vue';
 
 export let iconFontsUnicode = ref({
-    'icon-back-to-window': "\uE73F",
-    'icon-full-screen': "\uE740",
-    'icon-pause': "\uEDB4",
-    'icon-upload': "\uE898",
-    'icon-open': "\uE8E5",
-    'icon-play': "\uEDB5",
-    'icon-minimize': "\uE921",
-    'icon-maximize': "\uE922",
-    'icon-close': "\uE8BB",
-    'icon-restore': "\uE923",
-    'icon-repeat': "\uE8EE",
-    'icon-repeat-one': "\uE8ED",
-    'icon-repeat-off': "\uF0D1"
+    'icon-back-to-window': "E73F",
+    'icon-full-screen': "E740",
+    'icon-pause': "EDB4",
+    'icon-upload': "E898",
+    'icon-open': "E8E5",
+    'icon-play': "EDB5",
+    'icon-back': "E830",
+    'icon-minimize': "E921",
+    'icon-maximize': "E922",
+    'icon-close': "E8BB",
+    'icon-restore': "E923",
+    'icon-repeat': "E8EE",
+    'icon-repeat-one': "E8ED",
+    'icon-repeat-off': "F0D1"
 });
 export let iconFontsFamily = ref('SegMDL2_unOfficial')
 
