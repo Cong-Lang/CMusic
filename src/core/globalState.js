@@ -16,7 +16,7 @@ export let iconFontsUnicode = ref({
     'icon-repeat-one': "E8ED",
     'icon-repeat-off': "F0D1"
 });
-export let iconFontsFamily = ref('SegMDL2_unOfficial')
+export let iconFontsFamily = ref('Fluent System Icons')
 
 export let globalState = {
     page: ref(0),
