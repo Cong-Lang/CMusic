@@ -65,6 +65,9 @@
                 <h5 class="settings-zone-title">调试 / 测试</h5>
                 <winbutton @click="fileControl.readOpenDirectoryFiles()">获取文件夹内音乐</winbutton>
             </div>
+            <div class="open-source-projects">
+
+            </div>
         </div>
     </wincontentdialog>
     <TransitionGroup name="container">
@@ -269,7 +272,9 @@ setInterval(() => {
 function tabPlayIcon() {
     if (globalState.haveSound.value) {
         globalState.sound.on('end', () => {
-            globalState.isPlay.value = false;
+            if (globalState.sound.loop = false) {
+                globalState.isPlay.value = false;
+            }
         });
         if (globalState.sound.playing()) {
             globalState.CurrentTime.value = (globalState.sound.seek() / globalState.sound.duration()) * 100
