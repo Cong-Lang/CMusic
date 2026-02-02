@@ -13,12 +13,17 @@ export class iconFontsManager {
         return { success: true }
     }
 
+    static async changeIconFontsFamily(fontsFamily) {
+        iconFontsFamily.value = fontsFamily;
+        console.log('iconFontsFamily 已修改为' + fontsFamily);
+    }
+
     static async changeIconFontsUnicode(id, unicode) {
         iconFontsUnicode.value[id] = unicode;
         console.log(id + '已修改为' + unicode);
     }
 
-    static async readIconFontsUnicode() {
+    static async readIconFonts() {
         const Conf = await window.electronAPI.readFile('.cmusic')
         if (Conf.success == true) {
             const data = JSON.parse(Conf.data)

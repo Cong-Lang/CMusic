@@ -37,7 +37,8 @@
                         <tr>
                             <td>字体名称</td>
                             <td>
-                                <wininputbox placeholder="字体名称" :value="iconFontsFamily" />
+                                <wininputbox placeholder="字体名称" :value="iconFontsFamily"
+                                    @change="iconFontsManager.changeIconFontsFamily($event.target.value)" />
                             </td>
                         </tr>
                         <tr>
@@ -317,7 +318,7 @@ onBeforeUnmount(() => {
 });
 
 async function init() {
-    iconFontsManager.readIconFontsUnicode()
+    iconFontsManager.readIconFonts()
     try {
         globalState.items.value = JSON.parse((await window.electronAPI.readFile('.cmusic'))['data'])
     } catch {
