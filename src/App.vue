@@ -29,13 +29,14 @@
     <wincontentdialog :items="[{ 'text': '确定' }, { 'text': '确定' }]" ref="window1Ref" title="设置">
         <div class="settings">
             <div class="icon-fonts">
-                <h5 class="settings-zone-title">字体设置</h5>
-                <h6 class="settings-zone-info">您可以在这里配置图标类字体在软件内的Unicode</h6>
-                <winbutton @click="iconFontsManager.writeIconFontsUnicode(true);">保存配置</winbutton>
+                <h5 class="settings-zone-title">图标字体设置</h5>
+                <h6 class="settings-zone-info">您可以在这里配置图标类字体在软件内的Unicode和字体家族</h6>
+                <h6 class="settings-zone-info">修改完成后请保存配置</h6>
+                <winbutton @click="iconFontsManager.writeIconFontsUnicode(true);">保存图标字体配置</winbutton>
                 <table border="0" class="settings-table">
                     <tbody>
                         <tr>
-                            <td>字体名称</td>
+                            <td>字体家族</td>
                             <td>
                                 <wininputbox placeholder="字体名称" :value="iconFontsFamily"
                                     @change="iconFontsManager.changeIconFontsFamily($event.target.value)" />
@@ -272,6 +273,7 @@ setInterval(() => {
 
 
 function tabPlayIcon() {
+    globalState.CurrentTime.value = 0
     if (globalState.haveSound.value) {
         globalState.sound.on('end', () => {
             if (globalState.sound.loop = false) {
@@ -292,7 +294,8 @@ function updateSound(time) {
 
 const handleKeydown = (e) => {
     if (e.keyCode === 32 || e.key === ' ') {
-        if (globalState.haveSound && !playFocus) {
+        console.log(playFocus.value)
+        if (globalState.haveSound && !playFocus.value) {
             musicManager.play()
         }
     } else if (e.keyCode === 39 || e.key === 'ArrowRight') {
@@ -622,7 +625,7 @@ init()
     filter: blur(16px);
     pointer-events: none;
     opacity: 0;
-    transition: all 0.5s;
+    transition: all 0.4s;
 }
 
 .card-img:hover~.card-img-gloss {

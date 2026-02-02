@@ -34,5 +34,6 @@ export let globalState = {
     musicItems: shallowRef(),
     windowMusicError: null,
     window1: null,
-    repeatPlay: ref(false)
+    repeatPlay: ref(false),
+    sound: null
 }
