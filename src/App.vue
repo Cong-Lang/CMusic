@@ -31,7 +31,7 @@
             <div class="icon-fonts">
                 <h5 class="settings-zone-title">字体设置</h5>
                 <h6 class="settings-zone-info">您可以在这里配置图标类字体在软件内的Unicode</h6>
-                <winbutton @click="iconFontsManager.writeIconFontsUnicode()">保存配置</winbutton>
+                <winbutton @click="iconFontsManager.writeIconFontsUnicode(true);">保存配置</winbutton>
                 <table border="0" class="settings-table">
                     <tbody>
                         <tr>
