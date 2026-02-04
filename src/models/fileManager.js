@@ -97,7 +97,9 @@ export class musicManager {
     }
 
     static repeatPlay() {
-        globalState.sound.loop(!globalState.repeatPlay.value)
+        console.log(globalState.sound)
+        globalState.sound.loop(!globalState.repeatPlay.value);
+        globalState.sound.loop = !globalState.repeatPlay.value
         globalState.repeatPlay.value = !globalState.repeatPlay.value;
     }
 };

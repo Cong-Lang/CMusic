@@ -90,7 +90,7 @@
                             <img alt="" :src="item.img" class="card-img-gloss"></img>
                             <p style="box-sizing:border-box;padding: 12px 0 0 12px;margin: 0;">{{ item.title }}</p>
                             <p style="font-size: small;padding: 4px 0 0 12px;margin: 0;color: #646464;">{{ item.author
-                                }}
+                            }}
                             </p>
                         </wincard>
                     </div>
